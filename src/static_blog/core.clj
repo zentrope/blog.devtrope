@@ -101,7 +101,6 @@
       (throw (Exception. (str "Unable to find template: " type))))
     (slurp path)))
 
-
 (defn- md->title
   [raw]
   (let [lines (string/split raw #"\n")
@@ -109,11 +108,10 @@
         heading (first headings)]
     (string/replace heading #"^[#]\s+" "")))
 
-(def md-extensions (- (Extensions/ALL) (Extensions/HARDWRAPS)))
-
 (defn- md->html
   [raw]
-  (let [processor (PegDownProcessor. md-extensions)]
+  (let [md-extensions (- (Extensions/ALL) (Extensions/HARDWRAPS))
+        processor (PegDownProcessor. md-extensions)]
     (.markdownToHtml processor raw)))
 
 ;;-----------------------------------------------------------------------------
@@ -214,20 +212,16 @@
   (println "Articles:")
   (publish-articles!)
   (println "Index:")
-  (publish-home!)
-  )
-
-(defn- cwd
-  []
-  (.getAbsolutePath (io/as-file (System/getProperty "user.dir"))))
+  (publish-home!))
 
 (defn- parse
   [args]
-  (cli/cli args
-           ["-h" "--help" "Display this help message." :default false :flag true]
-           ["-s" "--source" "Location of your site's site files." :default *source*]
-           ["-u" "--url" "URL representing the site." :default *site-url*]
-           ["-t" "--target" "Place to put your generated site." :default *target*]))
+  (cli/cli
+   args
+   ["-h" "--help" "Display this help message." :default false :flag true]
+   ["-s" "--source" "Location of your site's site files." :default *source*]
+   ["-u" "--url" "URL representing the site." :default *site-url*]
+   ["-t" "--target" "Place to put your generated site." :default *target*]))
 
 (defn -main
   "Application entry point."

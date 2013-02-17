@@ -23,3 +23,6 @@
     structure, then pass it through transforms. No need to
     differentiate between "posts" (shown in the index page) and
     "articles" (each on their own page), etc.
+
+  * Generalize template interpolation: just a map and a blob of
+    text. Replace occurances of keys in blob with values in map.
