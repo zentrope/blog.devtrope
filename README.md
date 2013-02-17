@@ -1,6 +1,14 @@
 # static-blog
 
-FIXME: description
+In Development
+
+Basic idea is to create a command line tool. You tell it where the
+"source" is, where the "target" is, and what the site URL should be,
+and then let it rip.
+
+No plugins, no build file, no config file.
+
+And no Ruby.
 
 ## Installation
 
@@ -8,13 +16,11 @@ Download from http://example.com/FIXME.
 
 ## Usage
 
-FIXME: explanation
-
-    $ java -jar static-blog-0.1.0-standalone.jar [args]
+TBD
 
 ## Options
 
-FIXME: listing of options this app accepts.
+TBD
 
 ## Examples
 
@@ -24,12 +30,8 @@ FIXME: listing of options this app accepts.
 
 ...
 
-### Any Other Sections
-### That You Think
-### Might be Useful
-
 ## License
 
-Copyright © 2013 FIXME
+Copyright © 2013 Keith Irwin
 
 Distributed under the Eclipse Public License, the same as Clojure.
