@@ -31,7 +31,7 @@
 
 (defn- mk-post-url
   [parent]
-  (str *site-url* sep parent sep "index.html"))
+  (str *site-url* parent sep "index.html"))
 
 (defn- num?
   [s]
@@ -209,11 +209,6 @@
   (println " " *target*)
   (println "Using Site URL:")
   (println " " *site-url*)
-
-  ;; (doseq [s (source-files)]
-  ;;   (pp/pprint s))
-
-
   (println "Assets:")
   (publish-assets!)
   (println "Articles:")
@@ -244,5 +239,6 @@
       (System/exit 0))
 
     (binding [*source* (.getAbsolutePath (io/as-file (:source options)))
-              *target* (.getAbsolutePath (io/as-file (:target options)))]
+              *target* (.getAbsolutePath (io/as-file (:target options)))
+              *site-url* (if (:url options) (:url options) *site-url*)]
       (do-run))))

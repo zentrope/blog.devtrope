@@ -5,6 +5,10 @@
   * Consider making date stuff finer grained so a template can do
     interesting things with it.
 
+  * Use the markdown file name itself as the title.
+
+  * Allow "html" articles as well.
+
   * Document directory structure.
 
   * Document template variables.
