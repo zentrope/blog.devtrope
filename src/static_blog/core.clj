@@ -7,7 +7,8 @@
   ;;
   (:gen-class)
   (:import
-   [org.pegdown PegDownProcessor Extensions])
+   [org.pegdown PegDownProcessor Extensions]
+   [java.text SimpleDateFormat])
   (:require
    [clojure.tools.cli :as cli :only [cli]]
    [clojure.string :as string]
@@ -16,6 +17,8 @@
 
 (def cwd (System/getProperty "user.dir"))
 (def sep java.io.File/separator)
+(def sdf-in (SimpleDateFormat. "yyyy-MM-dd"))
+(def sdf-out (SimpleDateFormat. "EEEE, MMMM dd, yyyy"))
 
 (def ^:dynamic *source* (str cwd sep "site"))
 (def ^:dynamic *target* (str cwd sep "pub"))
@@ -26,13 +29,36 @@
   (let [path (.getParent f)]
     (.replace path *source* "")))
 
+(defn- mk-post-url
+  [parent]
+  (str *site-url* sep parent sep "index.html"))
+
+(defn- num?
+  [s]
+  (try
+    (number? (read-string s))
+    (catch Throwable t
+      false)))
+
+(defn- date-str
+  [[year month day]]
+  (->> (format "%4s-%2s-%2s" year month day)
+       (.parse sdf-in)
+       (.format sdf-out)))
+
+(defn- mk-date
+  [f]
+  (->> (string/split (str f) (re-pattern sep))
+       (filter #(num? %))
+       (take 3)
+       (date-str)))
+
 (defn- post-files
   []
   (->> (io/as-file (str *source* sep "articles"))
        (file-seq)
        (filter #(.isFile %))
-       (map #(into {} {:file %
-                       :location (str *site-url* sep (parent-of %) sep "index.html")}))
+       (map #(into {} {:file % :date (mk-date %) :location (mk-post-url (parent-of %))}))
        (sort-by :file)
        (reverse)))
 
@@ -42,6 +68,7 @@
        (file-seq)
        (filter #(-> (.getName %) (.endsWith ".md")))
        (map #(into {} {:target (str *target* (parent-of %) sep "index.html")
+                       :date (mk-date %)
                        :src %}))))
 
 (defn- asset-files
@@ -93,9 +120,10 @@
 ;; Articles
 
 (defn- article-merge
-  [template title body]
+  [template title date body]
   (-> (string/replace template #":site-url" *site-url*)
       (string/replace #":article-title" title)
+      (string/replace #":date" date)
       (string/replace #":article" body)))
 
 (defn- publish-article!
@@ -107,7 +135,7 @@
         target (io/as-file (:target article))]
     (println " publishing" target)
     (.mkdirs (.getParentFile target))
-    (spit target (article-merge template title body))))
+    (spit target (article-merge template title (:date article) body))))
 
 (defn- publish-articles!
   []
@@ -127,7 +155,9 @@
         (.mkdirs to))
       (when (.isFile from)
         (.mkdirs (.getParentFile to))
-        (io/copy from to)))))
+        (if (.endsWith (.getName from) ".html")
+          (spit to (string/replace (slurp from) #":site-url" *site-url*))
+          (io/copy from to))))))
 
 ;;-----------------------------------------------------------------------------
 ;; Home page
@@ -138,10 +168,11 @@
       (string/replace #":articles" (string/join "\n\n" posts))))
 
 (defn- merge-post
-  [template title body link]
+  [template title body date link]
   (-> (string/replace template #":site-url" *site-url*)
       (string/replace #":post-title" title)
       (string/replace #":post-body" body)
+      (string/replace #":post-date" date)
       (string/replace #":permalink" link)))
 
 (defn- slurp-special
@@ -162,6 +193,7 @@
                   (merge-post template
                               title
                               (md->html text)
+                              (:date p)
                               (:location p))))]
     (println " writing" index-file)
     (spit index-file
@@ -177,6 +209,11 @@
   (println " " *target*)
   (println "Using Site URL:")
   (println " " *site-url*)
+
+  ;; (doseq [s (source-files)]
+  ;;   (pp/pprint s))
+
+
   (println "Assets:")
   (publish-assets!)
   (println "Articles:")
