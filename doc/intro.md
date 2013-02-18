@@ -1,3 +1,3 @@
-# Introduction to static-blog
+# How to create a source directory
 
-TODO: write [great documentation](http://jacobian.org/writing/great-documentation/what-to-write/)
+I'm still working that out.

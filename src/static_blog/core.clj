@@ -15,6 +15,9 @@
 (def sep java.io.File/separator)
 (def sdf-in (SimpleDateFormat. "yyyy-MM-dd"))
 (def sdf-out (SimpleDateFormat. "EEEE, MMMM dd, yyyy"))
+(def feed-out (SimpleDateFormat. "EEE, dd MMM yyyy HH:mm:ss ZZZZ"))
+
+(def publish-date (.format feed-out (System/currentTimeMillis)))
 
 (def ^:dynamic *source* (str cwd sep "site"))
 (def ^:dynamic *target* (str cwd sep "pub"))
@@ -35,22 +38,28 @@
        (catch Throwable t
          false)))
 
-(defn- date-str
-  [[year month day]]
-  (->> (format "%4s-%2s-%2s" year month day)
-       (.parse sdf-in)
-       (.format sdf-out)))
-
-(defn- mk-date
+(defn- mk-raw-date
   [f]
   (->> (string/split (str f) (re-pattern sep))
        (filter #(num? %))
        (take 3)
-       (date-str)))
+       (apply format "%4s-%2s-%2s")
+       (.parse sdf-in)))
+
+(defn- mk-date
+  [f]
+  (->> (mk-raw-date f)
+       (.format sdf-out)))
+
+(defn- mk-machine-date
+  [f]
+  (->> (mk-raw-date f)
+       (.format feed-out)))
 
 (defn- site-data
   []
-  {:site-url *site-url*})
+  {:site-url *site-url*
+   :publish-machine-date publish-date})
 
 (defn- merge-template
   [text data]
@@ -66,6 +75,7 @@
   [file]
   {:site-url *site-url*
    :post-file file
+   :post-machine-date (mk-machine-date file)
    :post-date (mk-date file)
    :post-url (mk-post-url (parent-of file))
    :post-title (string/replace (.getName file) #"[.]md" "")
@@ -99,6 +109,8 @@
     :archive "archive.html"
     :post "post.html"
     :archive-link "archive-link.html"
+    :feed "feed.rss"
+    :feed-item "feed-item.rss"
     :else (throw (Exception. (str "Unknown template " type ".")))))
 
 (defn- template-path
@@ -141,35 +153,27 @@
 
 ;;-----------------------------------------------------------------------------
 
-(defn- archive-data
-  [posts]
-  (->> (for [p posts] (merge-template (load-template :archive-link) p))
-       (string/join "\n")
-       (assoc (site-data) :archive-list)))
-
-(defn- publish-archive!
-  []
-  (let [template (load-template :archive)
-        target (io/as-file (str *target* sep "archive.html"))
-        data (archive-data (stories))]
-    (println " writing" target)
-    (spit target (merge-template template data))))
-
-;;-----------------------------------------------------------------------------
-
-(defn- home-data
-  [posts]
-  (->> (for [p posts] (merge-template (load-template :post) p))
+(defn- post-data
+  [template-key var-key posts]
+  (->> (for [p posts] (merge-template (load-template template-key) p))
        (string/join "\n\n")
-       (assoc (site-data) :post-list)))
+       (assoc (site-data) var-key)))
 
-(defn- publish-home!
-  []
-  (let [template (load-template :index)
-        target (io/as-file (str *target* sep "index.html"))
-        data (home-data (stories))]
+(defn- publish!
+  [page-template post-template list-var page-file]
+  (let [template (load-template page-template)
+        target (io/as-file (str *target* sep page-file))
+        data (post-data post-template list-var (stories))]
     (println " writing" target)
     (spit target (merge-template template data))))
+
+(defn- publish-generated!
+  []
+  (let [generators [[:archive :archive-link :archive-list "archive.html"]
+                    [:index :post :post-list "index.html"]
+                    [:feed :feed-item :feed-items "feed.rss"]]]
+        (doseq [g generators]
+          (apply publish! g))))
 
 ;;-----------------------------------------------------------------------------
 
@@ -184,8 +188,7 @@
   (println "\nPosts:")
   (publish-posts!)
   (println "\nGenerated pages:")
-  (publish-home!)
-  (publish-archive!)
+  (publish-generated!)
   (println "\ndone."))
 
 (defn- parse
