@@ -1,14 +1,10 @@
 (ns static-blog.core
-  ;;
-  ;; Having just scrapped this together, I now see that this process
-  ;; could really benefit from the same sort of "middleware" concept
-  ;; the ring library uses as well as the notion of a "project" map,
-  ;; such as leiningen uses.
-  ;;
   (:gen-class)
+
   (:import
    [org.pegdown PegDownProcessor Extensions]
    [java.text SimpleDateFormat])
+
   (:require
    [clojure.tools.cli :as cli :only [cli]]
    [clojure.string :as string]
@@ -31,14 +27,13 @@
 
 (defn- mk-post-url
   [parent]
-  (str *site-url* parent sep "index.html"))
+  (str *site-url* parent sep (if (.startsWith *site-url* "file://") "index.html" "")))
 
 (defn- num?
   [s]
-  (try
-    (number? (read-string s))
-    (catch Throwable t
-      false)))
+  (try (number? (read-string s))
+       (catch Throwable t
+         false)))
 
 (defn- date-str
   [[year month day]]
@@ -53,23 +48,38 @@
        (take 3)
        (date-str)))
 
-(defn- post-files
+(defn- site-data
+  []
+  {:site-url *site-url*})
+
+(defn- merge-template
+  [text data]
+  (reduce (fn [a [k v]] (string/replace a (re-pattern (str k)) (str v))) text data))
+
+(defn- md->html
+  [raw]
+  (let [md-extensions (- (Extensions/ALL) (Extensions/HARDWRAPS))
+        processor (PegDownProcessor. md-extensions)]
+    (merge-template (.markdownToHtml processor raw) (site-data))))
+
+(defn- build-story
+  [file]
+  {:site-url *site-url*
+   :post-file file
+   :post-date (mk-date file)
+   :post-url (mk-post-url (parent-of file))
+   :post-title (string/replace (.getName file) #"[.]md" "")
+   :post-text (md->html (slurp file))
+   :post-target (str *target* (parent-of file) sep "index.html")})
+
+(defn- stories
   []
   (->> (io/as-file (str *source* sep "articles"))
        (file-seq)
+       (sort)
+       (reverse)
        (filter #(.isFile %))
-       (map #(into {} {:file % :date (mk-date %) :location (mk-post-url (parent-of %))}))
-       (sort-by :file)
-       (reverse)))
-
-(defn- source-files
-  []
-  (->> (io/as-file *source*)
-       (file-seq)
-       (filter #(-> (.getName %) (.endsWith ".md")))
-       (map #(into {} {:target (str *target* (parent-of %) sep "index.html")
-                       :date (mk-date %)
-                       :src %}))))
+       (map build-story)))
 
 (defn- asset-files
   []
@@ -88,60 +98,32 @@
     :index "index.html"
     :archive "archive.html"
     :post "post.html"
+    :archive-link "archive-link.html"
     :else (throw (Exception. (str "Unknown template " type ".")))))
 
 (defn- template-path
   [type]
   (str *source* sep "templates" sep (template-for type)))
 
-(defn load-template
+(defn- load-template
   [type]
   (let [path (io/as-file (template-path type))]
     (when (not (.exists path))
       (throw (Exception. (str "Unable to find template: " type))))
     (slurp path)))
 
-(defn- md->title
-  [raw]
-  (let [lines (string/split raw #"\n")
-        headings (filter #(.startsWith % "#") lines)
-        heading (first headings)]
-    (string/replace heading #"^[#]\s+" "")))
-
-(defn- md->html
-  [raw]
-  (let [md-extensions (- (Extensions/ALL) (Extensions/HARDWRAPS))
-        processor (PegDownProcessor. md-extensions)]
-    (.markdownToHtml processor raw)))
-
 ;;-----------------------------------------------------------------------------
-;; Articles
 
-(defn- article-merge
-  [template title date body]
-  (-> (string/replace template #":site-url" *site-url*)
-      (string/replace #":article-title" title)
-      (string/replace #":date" date)
-      (string/replace #":article" body)))
-
-(defn- publish-article!
-  [article]
-  (let [template (load-template :article)
-        raw (slurp (:src article))
-        title (md->title raw)
-        body (md->html raw)
-        target (io/as-file (:target article))]
-    (println " publishing" target)
-    (.mkdirs (.getParentFile target))
-    (spit target (article-merge template title (:date article) body))))
-
-(defn- publish-articles!
+(defn- publish-posts!
   []
-  (doseq [f (source-files)]
-    (publish-article! f)))
+  (doseq [f (stories)]
+    (let [template (load-template :article)
+          target (io/as-file (:post-target f))]
+      (println " publishing" target)
+      (.mkdirs (.getParentFile target))
+      (spit target (merge-template template f)))))
 
 ;;-----------------------------------------------------------------------------
-;; Assets
 
 (defn- publish-assets!
   []
@@ -154,73 +136,65 @@
       (when (.isFile from)
         (.mkdirs (.getParentFile to))
         (if (.endsWith (.getName from) ".html")
-          (spit to (string/replace (slurp from) #":site-url" *site-url*))
+          (spit to (merge-template (slurp from) (site-data)))
           (io/copy from to))))))
 
 ;;-----------------------------------------------------------------------------
-;; Home page
 
-(defn- merge-index
-  [template posts]
-  (-> (string/replace template #":site-url" *site-url*)
-      (string/replace #":articles" (string/join "\n\n" posts))))
+(defn- archive-data
+  [posts]
+  (->> (for [p posts] (merge-template (load-template :archive-link) p))
+       (string/join "\n")
+       (assoc (site-data) :archive-list)))
 
-(defn- merge-post
-  [template title body date link]
-  (-> (string/replace template #":site-url" *site-url*)
-      (string/replace #":post-title" title)
-      (string/replace #":post-body" body)
-      (string/replace #":post-date" date)
-      (string/replace #":permalink" link)))
+(defn- publish-archive!
+  []
+  (let [template (load-template :archive)
+        target (io/as-file (str *target* sep "archive.html"))
+        data (archive-data (stories))]
+    (println " writing" target)
+    (spit target (merge-template template data))))
 
-(defn- slurp-special
-  [file]
-  (let [text (slurp file)
-        title (md->title text)
-        lines (string/split text #"\n")
-        headless (filter #(not (re-matches #"^[#] .*$" %)) lines)]
-    [title (string/join "\n" headless)]))
+;;-----------------------------------------------------------------------------
+
+(defn- home-data
+  [posts]
+  (->> (for [p posts] (merge-template (load-template :post) p))
+       (string/join "\n\n")
+       (assoc (site-data) :post-list)))
 
 (defn- publish-home!
   []
-  (let [template (load-template :post)
-        index-template (load-template :index)
-        index-file (io/as-file (str *target* sep "index.html"))
-        posts (for [p (post-files)]
-                (let [[title text] (slurp-special (:file p))]
-                  (merge-post template
-                              title
-                              (md->html text)
-                              (:date p)
-                              (:location p))))]
-    (println " writing" index-file)
-    (spit index-file
-          (merge-index index-template posts))))
+  (let [template (load-template :index)
+        target (io/as-file (str *target* sep "index.html"))
+        data (home-data (stories))]
+    (println " writing" target)
+    (spit target (merge-template template data))))
 
 ;;-----------------------------------------------------------------------------
 
 (defn- do-run
   []
-  (println "Source location:")
-  (println " " *source*)
-  (println "Target location:")
-  (println " " *target*)
-  (println "Using Site URL:")
-  (println " " *site-url*)
-  (println "Assets:")
+  (println "\nLocations:")
+  (println " source:" *source*)
+  (println " target:" *target*)
+  (println " subdir:" *site-url*)
+  (println "\nAssets:")
   (publish-assets!)
-  (println "Articles:")
-  (publish-articles!)
-  (println "Index:")
-  (publish-home!))
+  (println "\nPosts:")
+  (publish-posts!)
+  (println "\nGenerated pages:")
+  (publish-home!)
+  (publish-archive!)
+  (println "\ndone."))
 
 (defn- parse
   [args]
   (cli/cli
    args
    ["-h" "--help" "Display this help message." :default false :flag true]
-   ["-s" "--source" "Location of your site's site files." :default *source*]
-   ["-u" "--url" "URL representing the site." :default *site-url*]
+   ["-s" "--source" "Location of your site's source files." :default *source*]
+   ["-u" "--url" "URL representing the site'd root." :default *site-url*]
    ["-t" "--target" "Place to put your generated site." :default *target*]))
 
 (defn -main
