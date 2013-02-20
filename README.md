@@ -125,12 +125,12 @@ Let's start with an example:
 There are three main directories:
 
   * **articles:**<br/>
-    A sub-directory of markdown files representing, hopefully, the
-    reason you're interesting in blogging in the first place.
+    A tree of markdown files representing, hopefully, the
+    reason you're interested in blogging in the first place.
 
   * **assets:**<br/>
-    All the stuff that makes up your site, referred
-    to by your articles or by the templates. Images, for instance,
+    All the stuff that makes up your site, potentially referred
+    to by your articles or by the templates. Images, for instance, and
     scripts, stylesheets, podcasts, zip files: the works. Everything
     that's not an article and not a template.
 
@@ -158,8 +158,8 @@ Let's use the following (from the above) as an example:
     │       │       └── welcome-all
     │       │           └── Welcome to my Blog.md
 
-The **Article path** contains all of the metadata about the article
-itself, including:
+The **Article path** contains all of the metadata about the article,
+including:
 
   * The url: _domain.com/2013/01/15/welcome-all_
 
@@ -177,9 +177,9 @@ indicated by the path to the markdown file, like so:
 
 Some caveats:
 
-  * You probably don't need an `h1` level headl ine at the beginning
+  * You probably don't need an `h1` level head line at the beginning
     because the software will create one for you based on the name of
-    the file itself (with the `.md` extension removed).
+    the file (with the `md` extension removed).
 
   * You can use the template variable `:site-url` in your markdown to
     refer to the blog's document root so that you can link to images
@@ -187,22 +187,22 @@ Some caveats:
 
         I really enjoyed Ultimate Spider-Man:
 
-         ![Cover](:site-url/assets/images/ultimate-spider-man-cover.png)
+         ![Cover](:site-url/images/ultimate-spider-man-cover.png)
 
         because it focused on Peter Parker more than
         Spider-Man. Parker is the heart and soul of that story.
 
 That hardest part of all this is setting up the HTML templates. Once
-that's done, as you can see from the above, actually putting down new
-content to be published should be easy. That's what you'll be doing
-most of the time.
+that's done, actually putting down new content to be published should
+be as easy is creating date-based sub-directories and then editing
+plain test files.
 
 ### Assets
 
 In general, assets are just raw files copied to your document root
 without malice aforethought. They should be arranged just as you want
 them on your real web site and you can refer to them in your templates
-and markdown files via the `:site-url` template variable
+and markdown files via the `:site-url` template variable.
 
 For instance, the following in a template file:
 
@@ -217,8 +217,8 @@ This will be copied to your document root:
     <document-root>/styles/main.css
 
 You can arrange things any way you want inside the asset directory. As
-long as you use `:site-url`, you should be able to create links as
-needed.
+long as you use `:site-url`, you should be able to create links
+pointing to the assets as needed.
 
 **NOTE:** If your assets end in `.js` or `.css` or `.html`, the
 software will merge references to `:site-url`. This is so that you can
@@ -226,16 +226,20 @@ use other assets inside your static content.
 
 For example, a css fragment:
 
+```css
     html, body {
       background: url(:site-url/images/bg.png);
     }
+```
 
 This is also useful for pages you want to have that aren't generated,
 such as a `contact.html` page, or an `about.html` page in which you
 might have (say) a navigation area:
 
+```html
     <li><a href=":site-url">home</a></li>
     <li><a href=":site-url/contact.html">contact</a></li>
+```
 
 or something similar.
 
