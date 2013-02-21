@@ -147,6 +147,13 @@
 
 ;;-----------------------------------------------------------------------------
 
+(defn- htmlish?
+  [f]
+  (let [name (string/lower-case (.getName f))]
+    (or (.endsWith name "html")
+        (.endsWith name "css")
+        (.endsWith name "js"))))
+
 (defn- publish-assets!
   []
   (doseq [{:keys [source target]} (asset-files)]
@@ -157,7 +164,7 @@
         (.mkdirs to))
       (when (.isFile from)
         (.mkdirs (.getParentFile to))
-        (if (.endsWith (.getName from) ".html")
+        (if (htmlish? from)
           (spit to (merge-template (slurp from) (site-data)))
           (io/copy from to))))))
 

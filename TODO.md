@@ -42,5 +42,5 @@
   * <strike>~~Computed pages should be resources (/contact) not file
     (contact.html).~~</strike>
 
-  * Recognizable assets should have :site-url interploated. (js, css,
-    html).
+  * <strike>~~Recognizable assets should have :site-url
+    interploated(e.g., js, css, html).~~</strike>
