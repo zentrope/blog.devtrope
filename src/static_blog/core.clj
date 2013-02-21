@@ -113,9 +113,15 @@
     :article "article.html"
     :else (throw (Exception. (str "Unknown template " type ".")))))
 
+(def ^:private template-out {:home "index.html"
+                             :archive (str "archive" sep "index.html")
+                             :feed "feed.rss"})
+
 (defn- template-target
   [type]
-  (io/as-file (str *target* sep (template-for type))))
+  (if-let [place (get template-out type)]
+    (io/as-file (str *target* sep place))
+    (throw (Exception. (str "Unknown template target " type ".")))))
 
 (defn- template-path
   [type]
@@ -169,6 +175,7 @@
         target (template-target page-template)
         data (post-data article-template (stories))]
     (println " writing" target)
+    (.mkdirs (.getParentFile target))
     (spit target (merge-template template data))))
 
 (defn- publish-generated!

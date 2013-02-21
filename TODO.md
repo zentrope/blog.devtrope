@@ -39,5 +39,8 @@
   * Allow static pages (not articles, e.g., contact, about) to be
     markdown, with a template for them as well.
 
-  * Computed pages should be resources (/contact) not file
-    (contact.html).
+  * <strike>~~Computed pages should be resources (/contact) not file
+    (contact.html).~~</strike>
+
+  * Recognizable assets should have :site-url interploated. (js, css,
+    html).
