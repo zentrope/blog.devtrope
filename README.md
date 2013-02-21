@@ -114,13 +114,13 @@ Let's start with an example:
     │   └── styles
     │       └── site.css
     └── templates
-        ├── archive-link.html
+        ├── archive-article.html
         ├── archive.html
         ├── article.html
-        ├── feed-item.rss
+        ├── feed-article.rss
         ├── feed.rss
-        ├── index.html
-        └── post.html
+        ├── home.html
+        └── home-article.html
 
 There are three main directories:
 
@@ -247,16 +247,16 @@ or something similar.
 
 Random notes....
 
-- index.html:<br/>
+- home.html:<br/>
   The main page containing the full test of your
   most recent articles.
 
-    - post.html: An HTML fragment representing a single article as
+    - home-article.html: An HTML fragment representing a single article as
       it appears when it's merged into _index.html_.
 
 - archive.html: <br/>A single linking to all of your articles.
 
-    - archive-link.html: An HTML fragment representing a single article
+    - archive-article.html: An HTML fragment representing a single article
       as it appears when it's merged into the _archive.html_.
 
 - article.html: <br/>
@@ -266,7 +266,7 @@ Random notes....
 - feed.rss:<br/>
   The format for your RSS 2.0 feed.
 
-    - feed-item.rss: The RSS 2.0 "item" XML template for how you
+    - feed-article.rss: The RSS 2.0 "item" XML template for how you
       want your blog to be seen via RSS.
 
 ### Template Variables Reference
@@ -276,40 +276,34 @@ There are three types of template vars:
   * **metadata** (:site-url, :pub-machine-date)<br/>Usable on any page
     for any reason.
 
-  * **posts** (:post-title, :post-text (etc))<br/>For merging into
+  * **posts** (:article-title, :article-text (etc))<br/>For merging into
     templates representing a single post (item.rss, article.html,
     post.html).
 
-  * **aggregates** (:post-list, :feed-items)<br/> For injecting a
+  * **aggregates** (:article-list, :feed-items)<br/> For injecting a
     collection of posts (html fragments) into a larger container page
     (index.html, archive.html, feed.rss).
 
-_Implementation Note: I should just settle on the word "article"
-rather than mix in this notion of a post._
+The details:
 
   * `:site-url` <br/>
     The web site's document root. Normally blank if you
     deploy to the top of your domain (e.g., _domain.com/index.html_), or
     a subdirectory _/blog_, if not (e.g., _domain.com/**blog**/index.html_).
 
-  * `:post-title`
-  * `:post-date`
-  * `:post-text`
-  * `:post-url`
-  * `:post-machine-date` [feed]
+  * `:article-title`
+  * `:article-date`
+  * `:article-text`
+  * `:article-url`
+  * `:article-machine-date` [feed]
   * `:build-machine-date` [feed]
   * `:pub-machine-date` [feed]
 
 The following are for interpolating a list of articles, formatted by a
 sub-template into a list pages, such as an RSS feed, the home page, or
-the archive listing. _Implementation note: Why do these have to have
-separate names? Might as well just use the same name for all of them,
-no? We know what to inject based on the name of the templates
-themselves._
+the archive listing.
 
-  * `:feed-items`    --> (feed.rss)
-  * `:archive-list`  --> (archive.html)
-  * `:post-list`     --> (index.html)
+  * `:article-list`     --> (home page, feed xml, archive page)
 
 ## License
 

@@ -74,13 +74,13 @@
 (defn- build-story
   [file]
   {:site-url *site-url*
-   :post-file file
-   :post-machine-date (mk-machine-date file)
-   :post-date (mk-date file)
-   :post-url (mk-post-url (parent-of file))
-   :post-title (string/replace (.getName file) #"[.]md" "")
-   :post-text (md->html (slurp file))
-   :post-target (str *target* (parent-of file) sep "index.html")})
+   :article-file file
+   :article-machine-date (mk-machine-date file)
+   :article-date (mk-date file)
+   :article-url (mk-post-url (parent-of file))
+   :article-title (string/replace (.getName file) #"[.]md" "")
+   :article-text (md->html (slurp file))
+   :article-target (str *target* (parent-of file) sep "index.html")})
 
 (defn- stories
   []
@@ -104,14 +104,18 @@
 (defn- template-for
   [type]
   (case type
-    :article "article.html"
-    :index "index.html"
+    :home "home.html"
+    :home-article "home-article.html"
     :archive "archive.html"
-    :post "post.html"
-    :archive-link "archive-link.html"
+    :archive-article "archive-article.html"
     :feed "feed.rss"
-    :feed-item "feed-item.rss"
+    :feed-article "feed-article.rss"
+    :article "article.html"
     :else (throw (Exception. (str "Unknown template " type ".")))))
+
+(defn- template-target
+  [type]
+  (io/as-file (str *target* sep (template-for type))))
 
 (defn- template-path
   [type]
@@ -130,7 +134,7 @@
   []
   (doseq [f (stories)]
     (let [template (load-template :article)
-          target (io/as-file (:post-target f))]
+          target (io/as-file (:article-target f))]
       (println " publishing" target)
       (.mkdirs (.getParentFile target))
       (spit target (merge-template template f)))))
@@ -154,24 +158,24 @@
 ;;-----------------------------------------------------------------------------
 
 (defn- post-data
-  [template-key var-key posts]
+  [template-key posts]
   (->> (for [p posts] (merge-template (load-template template-key) p))
        (string/join "\n\n")
-       (assoc (site-data) var-key)))
+       (assoc (site-data) :article-list)))
 
 (defn- publish!
-  [page-template post-template list-var page-file]
+  [page-template article-template]
   (let [template (load-template page-template)
-        target (io/as-file (str *target* sep page-file))
-        data (post-data post-template list-var (stories))]
+        target (template-target page-template)
+        data (post-data article-template (stories))]
     (println " writing" target)
     (spit target (merge-template template data))))
 
 (defn- publish-generated!
   []
-  (let [generators [[:archive :archive-link :archive-list "archive.html"]
-                    [:index :post :post-list "index.html"]
-                    [:feed :feed-item :feed-items "feed.rss"]]]
+  (let [generators [[:archive :archive-article]
+                    [:home :home-article]
+                    [:feed :feed-article]]]
         (doseq [g generators]
           (apply publish! g))))
 

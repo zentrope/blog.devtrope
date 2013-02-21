@@ -28,3 +28,16 @@
   * <strike>~~Generalize template interpolation: just a map and a blob
     of text. Replace occurances of keys in blob with values in
     map.~~</strike>
+
+  * <strike>~~Rationalize the template var names and the template file
+    names.~~</strike>
+
+  * Add a "serve" facility so you can run this on localhost:port and
+    thus not have to use explicit "index.html" references if you don't
+    want to.
+
+  * Allow static pages (not articles, e.g., contact, about) to be
+    markdown, with a template for them as well.
+
+  * Computed pages should be resources (/contact) not file
+    (contact.html).
