@@ -10,7 +10,7 @@
 
   * Allow "html" articles as well.
 
-  * <strike>~~Document directory structure.~~</strike>
+  * Document directory structure.
 
   * Document template variables.
 
@@ -36,8 +36,8 @@
     thus not have to use explicit "index.html" references if you don't
     want to.
 
-  * Allow static pages (not articles, e.g., contact, about) to be
-    markdown, with a template for them as well.
+  * <strike>~~Allow static pages (not articles, e.g., contact, about)
+    to be markdown, with a template for them as well.~~</strike>
 
   * <strike>~~Computed pages should be resources (/contact) not file
     (contact.html).~~</strike>

@@ -24,13 +24,11 @@
 (def ^:dynamic *site-url* (str "file://" *target*))
 
 (defn- parent-of
-  [f]
-  (let [path (.getParent f)]
-    (.replace path *source* "")))
-
-(defn- mk-post-url
-  [parent]
-  (str *site-url* parent sep (if (.startsWith *site-url* "file://") "index.html" "")))
+  ([f old-path]
+     (-> (.getParent f)
+         (.replace old-path "")))
+  ([f]
+     (parent-of f *source*)))
 
 (defn- num?
   [s]
@@ -46,16 +44,6 @@
        (apply format "%4s-%2s-%2s")
        (.parse sdf-in)))
 
-(defn- mk-date
-  [f]
-  (->> (mk-raw-date f)
-       (.format sdf-out)))
-
-(defn- mk-machine-date
-  [f]
-  (->> (mk-raw-date f)
-       (.format feed-out)))
-
 (defn- site-data
   []
   {:site-url *site-url*
@@ -66,32 +54,38 @@
   (reduce (fn [a [k v]] (string/replace a (re-pattern (str k)) (str v))) text data))
 
 (defn- md->html
-  [raw]
-  (let [md-extensions (- (Extensions/ALL) (Extensions/HARDWRAPS))
+  [raw & more]
+  (let [data (into (site-data) (apply hash-map more))
+        md-extensions (- (Extensions/ALL) (Extensions/HARDWRAPS))
         processor (PegDownProcessor. md-extensions)]
-    (merge-template (.markdownToHtml processor raw) (site-data))))
+    (merge-template (.markdownToHtml processor raw) data)))
 
-(defn- build-story
+(defn- file-name
   [file]
-  {:site-url *site-url*
-   :article-file file
-   :article-machine-date (mk-machine-date file)
-   :article-date (mk-date file)
-   :article-url (mk-post-url (parent-of file))
-   :article-title (string/replace (.getName file) #"[.]md" "")
-   :article-text (md->html (slurp file))
-   :article-target (str *target* (parent-of file) sep "index.html")})
+  (-> (.getName file)
+      (string/replace #"[.][^.]+$" "")))
 
-(defn- stories
+(defn- mk-article
+  [file]
+  (let [permalink (str *site-url* (parent-of file) sep)]
+    {:site-url *site-url*
+     :article-file file
+     :article-machine-date (->> (mk-raw-date file) (.format feed-out))
+     :article-date (->> (mk-raw-date file) (.format sdf-out))
+     :article-url permalink
+     :article-title (file-name file)
+     :article-text (md->html (slurp file) :article-url permalink)
+     :article-target (str *target* (parent-of file) sep "index.html")}b))
+
+(defn- articles
   []
   (->> (io/as-file (str *source* sep "articles"))
        (file-seq)
-       (sort)
        (reverse)
        (filter #(.isFile %))
-       (map build-story)))
+       (map mk-article)))
 
-(defn- asset-files
+(defn- assets
   []
   (->> (io/as-file (str *source* sep "assets"))
        (file-seq)
@@ -99,23 +93,31 @@
        (map #(into {} {:target (.replace % (str *source* sep "assets") *target*)
                        :source %}))))
 
+(defn- pages
+  []
+  (->> (io/as-file (str *source* sep "pages"))
+       (file-seq)
+       (filter #(.isFile %))
+       (map #(into (site-data)
+                   {:page-title (string/capitalize (file-name %))
+                    :page-content (md->html (slurp %))
+                    :target (str *target* sep (parent-of % (str *source* sep "pages"))
+                                 sep (file-name %) sep "index.html")}))))
+
 ;;-----------------------------------------------------------------------------
 
-(defn- template-for
-  [type]
-  (case type
-    :home "home.html"
-    :home-article "home-article.html"
-    :archive "archive.html"
-    :archive-article "archive-article.html"
-    :feed "feed.rss"
-    :feed-article "feed-article.rss"
-    :article "article.html"
-    :else (throw (Exception. (str "Unknown template " type ".")))))
+(def template-in  {:home "home.html"
+                   :home-article "home-article.html"
+                   :archive "archive.html"
+                   :archive-article "archive-article.html"
+                   :feed "feed.rss"
+                   :feed-article "feed-article.rss"
+                   :article "article.html"
+                   :page "page.html"})
 
-(def ^:private template-out {:home "index.html"
-                             :archive (str "archive" sep "index.html")
-                             :feed "feed.rss"})
+(def template-out {:home "index.html"
+                   :archive (str "archive" sep "index.html")
+                   :feed "feed.rss"})
 
 (defn- template-target
   [type]
@@ -125,7 +127,7 @@
 
 (defn- template-path
   [type]
-  (str *source* sep "templates" sep (template-for type)))
+  (str *source* sep "templates" sep (get template-in type)))
 
 (defn- load-template
   [type]
@@ -136,14 +138,22 @@
 
 ;;-----------------------------------------------------------------------------
 
-(defn- publish-posts!
+(defn- publish-articles!
   []
-  (doseq [f (stories)]
+  (doseq [f (articles)]
     (let [template (load-template :article)
           target (io/as-file (:article-target f))]
       (println " publishing" target)
       (.mkdirs (.getParentFile target))
       (spit target (merge-template template f)))))
+
+(defn- publish-pages!
+  []
+  (doseq [{:keys [page-title target page-content] :as page} (pages)]
+    (let [out (io/as-file target)]
+      (println " writing" out)
+      (.mkdirs (.getParentFile out))
+      (spit out (merge-template (load-template :page) page)))))
 
 ;;-----------------------------------------------------------------------------
 
@@ -156,7 +166,7 @@
 
 (defn- publish-assets!
   []
-  (doseq [{:keys [source target]} (asset-files)]
+  (doseq [{:keys [source target]} (assets)]
     (let [from (io/as-file source)
           to (io/as-file target)]
       (println " publishing" to)
@@ -170,9 +180,9 @@
 
 ;;-----------------------------------------------------------------------------
 
-(defn- post-data
-  [template-key posts]
-  (->> (for [p posts] (merge-template (load-template template-key) p))
+(defn- article-data
+  [template-key articles]
+  (->> (for [a articles] (merge-template (load-template template-key) a))
        (string/join "\n\n")
        (assoc (site-data) :article-list)))
 
@@ -180,7 +190,7 @@
   [page-template article-template]
   (let [template (load-template page-template)
         target (template-target page-template)
-        data (post-data article-template (stories))]
+        data (article-data article-template (articles))]
     (println " writing" target)
     (.mkdirs (.getParentFile target))
     (spit target (merge-template template data))))
@@ -203,8 +213,10 @@
   (println " subdir:" *site-url*)
   (println "\nAssets:")
   (publish-assets!)
-  (println "\nPosts:")
-  (publish-posts!)
+  (println "\nPages:")
+  (publish-pages!)
+  (println "\nArticles:")
+  (publish-articles!)
   (println "\nGenerated pages:")
   (publish-generated!)
   (println "\ndone."))
