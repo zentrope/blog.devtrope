@@ -1,17 +1,40 @@
 (ns static-blog.lib.utils
 
   (:require
-   [clojure.string :as string])
+   [clojure.string :as string]
+   [clojure.java.io :as io])
 
   (:import
-   [org.pegdown PegDownProcessor Extensions]))
+   [org.pegdown PegDownProcessor Extensions]
+   [java.text SimpleDateFormat]))
 
-(def sep java.io.File/separator)
+(def ^:private sep java.io.File/separator)
+(def ^:private rfc822 (SimpleDateFormat. "EEE, dd MMM yyyy HH:mm:ss ZZZZ"))
 
+(defn full-path
+  [file]
+  (.getAbsolutePath (io/as-file file)))
+
+(defn publish-date
+  []
+  (.format rfc822 (System/currentTimeMillis)))
+
+(defn num?
+  [s]
+  (try (number? (read-string s))
+       (catch Throwable t
+         false)))
+
+;; TODO: redo this so that we can add a "/" to the end, optionally.
 (defn path-from-vec
   "Turn a vector of strings into a file path."
   [& parts]
   (string/join sep parts))
+
+;; TODO: get rid of this when path-from-vec is fixed.
+(defn append-sep
+  [path]
+  (str path sep))
 
 (defn path-from-keys
   "Transform the values of the provided keys into a file path."
@@ -21,6 +44,8 @@
     (string/join sep vals)))
 
 (defn merge-template
+  "Replaces occurances of the keys in 'data' found in 'text' the the
+   corresponding values found in 'data'."
   [text data]
   (reduce (fn [a [k v]] (string/replace a (re-pattern (str k)) (str v))) text data))
 
