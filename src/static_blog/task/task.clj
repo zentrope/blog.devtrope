@@ -1,8 +1,8 @@
-(ns static-blog.plugin.plugin)
+(ns static-blog.task.task)
 
 ;; TODO: add a function to print out template vars the plugin is
 ;;       capable of fulfilling.
 
-(defprotocol Plugin
+(defprotocol Task
   (concern [this])
-  (publish! [this site]))
+  (invoke! [this site]))

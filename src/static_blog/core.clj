@@ -7,29 +7,26 @@
 
   (:require
    ;;
-   [static-blog.plugin.plugin :as plugin]
-   [static-blog.plugin.assets :as assets]
-   [static-blog.plugin.pages :as pages]
+   [static-blog.task.task :as task]
+   [static-blog.task.assets :as assets]
+   [static-blog.task.pages :as pages]
    ;;
    [clojure.tools.cli :as cli :only [cli]]
    [clojure.string :as string]
    [clojure.pprint :as pp]
    [clojure.java.io :as io]))
 
-
 (def cwd (System/getProperty "user.dir"))
 (def sep java.io.File/separator)
-
-;; I'll eventually get rid of this technique.
 
 (def ^:dynamic *source* (str cwd sep "site"))
 (def ^:dynamic *target* (str cwd sep "pub"))
 (def ^:dynamic *site-url* (str "file://" *target*))
 
-;; The idea is to make this thing as declarative as possible,
-;; so we should put as much as we can into a data structure
-;; that can be passed from "concern" to "concern", doing
-;; what's necessary.
+;; The idea is to make this thing as declarative as possible, so we
+;; should put as much as we can into a data structure that can be
+;; passed to individual tasks, each of which extract out what it cares
+;; about.
 
 (def site {:site-url *site-url*
            :source-dir *source*
@@ -199,27 +196,27 @@
 
 ;;-----------------------------------------------------------------------------
 
+(def tasks [(assets/mk-task)
+            (pages/mk-task)])
+
 (defn- do-run
   [site]
+  (println "\nLocations:")
+  (println " source:" *source*)
+  (println " target:" *target*)
+  (println " topurl:" (if (= ""  *site-url*) "/" *site-url*))
 
-  (let [plugins [(assets/mk-plugin)
-                 (pages/mk-plugin)]]
-    (println "\nLocations:")
-    (println " source:" *source*)
-    (println " target:" *target*)
-    (println " subdir:" *site-url*)
+  (doseq [t tasks]
+    (println "\n" (task/concern t))
+    (task/invoke! t site))
 
-    (doseq [p plugins]
-      (println "\n" (plugin/concern p))
-      (plugin/publish! p site))
+  (println "\nArticles:")
+  (publish-articles!)
 
-    (println "\nArticles:")
-    (publish-articles!)
+  (println "\nGenerated pages:")
+  (publish-generated!)
 
-    (println "\nGenerated pages:")
-    (publish-generated!)
-
-    (println "\ndone.")))
+  (println "\ndone."))
 
 (defn- parse
   [args]

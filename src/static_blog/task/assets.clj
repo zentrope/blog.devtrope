@@ -1,8 +1,8 @@
-(ns static-blog.plugin.assets
+(ns static-blog.task.assets
   (:require
    [clojure.java.io :as io]
    [clojure.string :as string]
-   [static-blog.plugin.plugin :as plugin]
+   [static-blog.task.task :as task]
    [static-blog.lib.utils :as utils]))
 
 (def ^{:private true :dynamic true} *site* {})
@@ -40,14 +40,14 @@
             (spit to (utils/merge-template (slurp from) *site*))
             (io/copy from to)))))))
 
-(deftype AssetPlugin []
-  plugin/Plugin
+(deftype AssetTask []
+  task/Task
   (concern [this]
-    "Asset Plugin")
-  (publish! [this site]
+    "Asset Task")
+  (invoke! [this site]
     (binding [*site* site]
       (publish-assets!))))
 
-(defn mk-plugin
+(defn mk-task
   []
-  (AssetPlugin.))
+  (AssetTask.))

@@ -1,8 +1,8 @@
-(ns static-blog.plugin.pages
+(ns static-blog.task.pages
   (:require
    [clojure.java.io :as io]
    [clojure.string :as string]
-   [static-blog.plugin.plugin :as plugin]
+   [static-blog.task.task :as task]
    [static-blog.lib.utils :as utils]))
 
 (def ^{:private true :dynamic true} *site* {})
@@ -63,16 +63,16 @@
       (.mkdirs (.getParentFile out))
       (spit out (utils/merge-template (template) page)))))
 
-(deftype PagesPlugin []
-  plugin/Plugin
+(deftype PagesTask []
+  task/Task
   ;;
   (concern [this]
-    "Pages Plugin")
+    "Pages Task")
   ;;
-  (publish! [this site]
+  (invoke! [this site]
     (binding [*site* site]
       (publish-pages!))))
 
-(defn mk-plugin
+(defn mk-task
   []
-  (PagesPlugin.))
+  (PagesTask.))
