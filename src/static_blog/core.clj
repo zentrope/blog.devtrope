@@ -6,22 +6,66 @@
    [java.text SimpleDateFormat])
 
   (:require
+   ;;
+   [static-blog.plugin.plugin :as plugin]
+   [static-blog.plugin.assets :as assets]
+   [static-blog.plugin.pages :as pages]
+   ;;
    [clojure.tools.cli :as cli :only [cli]]
    [clojure.string :as string]
    [clojure.pprint :as pp]
    [clojure.java.io :as io]))
 
+
 (def cwd (System/getProperty "user.dir"))
 (def sep java.io.File/separator)
+
+;; I'll eventually get rid of this technique.
+
+(def ^:dynamic *source* (str cwd sep "site"))
+(def ^:dynamic *target* (str cwd sep "pub"))
+(def ^:dynamic *site-url* (str "file://" *target*))
+
+;; The idea is to make this thing as declarative as possible,
+;; so we should put as much as we can into a data structure
+;; that can be passed from "concern" to "concern", doing
+;; what's necessary.
+
+(def site {:site-url *site-url*
+           :source-dir *source*
+           :target-dir *target*
+           ;;
+           :asset-dir "assets"
+           :page-dir "pages"
+           :template-dir "templates"
+           :article-dir "articles"
+           ;;
+           :home-page {:main-template "home.html"
+                       :sub-template "home-article.html"
+                       :target "index.html"}
+           ;;
+           :archive-page {:main-template "archive.html"
+                          :sub-template "archive-article.html"
+                          :target (str "archive" sep "index.html")}
+           ;;
+           :feed-page {:main-template "feed.rss"
+                       :sub-template "feed-article.rss"
+                       :target "feeds" sep "rss.xml"}
+           ;;
+           :article-page {:main-template "article.html"}
+           ;;
+           :static-page {:main-template "page.html"
+                         :output-page "index.html"}
+           ;;
+           :server {:port 4002
+                    :document-root *target*}
+           })
+
 (def sdf-in (SimpleDateFormat. "yyyy-MM-dd"))
 (def sdf-out (SimpleDateFormat. "EEEE, MMMM dd, yyyy"))
 (def feed-out (SimpleDateFormat. "EEE, dd MMM yyyy HH:mm:ss ZZZZ"))
 
 (def publish-date (.format feed-out (System/currentTimeMillis)))
-
-(def ^:dynamic *source* (str cwd sep "site"))
-(def ^:dynamic *target* (str cwd sep "pub"))
-(def ^:dynamic *site-url* (str "file://" *target*))
 
 (defn- parent-of
   ([f old-path]
@@ -75,7 +119,7 @@
      :article-url permalink
      :article-title (file-name file)
      :article-text (md->html (slurp file) :article-url permalink)
-     :article-target (str *target* (parent-of file) sep "index.html")}b))
+     :article-target (str *target* (parent-of file) sep "index.html")}))
 
 (defn- articles
   []
@@ -84,25 +128,6 @@
        (reverse)
        (filter #(.isFile %))
        (map mk-article)))
-
-(defn- assets
-  []
-  (->> (io/as-file (str *source* sep "assets"))
-       (file-seq)
-       (map #(.getAbsolutePath %))
-       (map #(into {} {:target (.replace % (str *source* sep "assets") *target*)
-                       :source %}))))
-
-(defn- pages
-  []
-  (->> (io/as-file (str *source* sep "pages"))
-       (file-seq)
-       (filter #(.isFile %))
-       (map #(into (site-data)
-                   {:page-title (string/capitalize (file-name %))
-                    :page-content (md->html (slurp %))
-                    :target (str *target* sep (parent-of % (str *source* sep "pages"))
-                                 sep (file-name %) sep "index.html")}))))
 
 ;;-----------------------------------------------------------------------------
 
@@ -147,37 +172,6 @@
       (.mkdirs (.getParentFile target))
       (spit target (merge-template template f)))))
 
-(defn- publish-pages!
-  []
-  (doseq [{:keys [page-title target page-content] :as page} (pages)]
-    (let [out (io/as-file target)]
-      (println " writing" out)
-      (.mkdirs (.getParentFile out))
-      (spit out (merge-template (load-template :page) page)))))
-
-;;-----------------------------------------------------------------------------
-
-(defn- htmlish?
-  [f]
-  (let [name (string/lower-case (.getName f))]
-    (or (.endsWith name "html")
-        (.endsWith name "css")
-        (.endsWith name "js"))))
-
-(defn- publish-assets!
-  []
-  (doseq [{:keys [source target]} (assets)]
-    (let [from (io/as-file source)
-          to (io/as-file target)]
-      (println " publishing" to)
-      (when (.isDirectory from)
-        (.mkdirs to))
-      (when (.isFile from)
-        (.mkdirs (.getParentFile to))
-        (if (htmlish? from)
-          (spit to (merge-template (slurp from) (site-data)))
-          (io/copy from to))))))
-
 ;;-----------------------------------------------------------------------------
 
 (defn- article-data
@@ -206,20 +200,26 @@
 ;;-----------------------------------------------------------------------------
 
 (defn- do-run
-  []
-  (println "\nLocations:")
-  (println " source:" *source*)
-  (println " target:" *target*)
-  (println " subdir:" *site-url*)
-  (println "\nAssets:")
-  (publish-assets!)
-  (println "\nPages:")
-  (publish-pages!)
-  (println "\nArticles:")
-  (publish-articles!)
-  (println "\nGenerated pages:")
-  (publish-generated!)
-  (println "\ndone."))
+  [site]
+
+  (let [plugins [(assets/mk-plugin)
+                 (pages/mk-plugin)]]
+    (println "\nLocations:")
+    (println " source:" *source*)
+    (println " target:" *target*)
+    (println " subdir:" *site-url*)
+
+    (doseq [p plugins]
+      (println "\n" (plugin/concern p))
+      (plugin/publish! p site))
+
+    (println "\nArticles:")
+    (publish-articles!)
+
+    (println "\nGenerated pages:")
+    (publish-generated!)
+
+    (println "\ndone.")))
 
 (defn- parse
   [args]
@@ -227,19 +227,30 @@
    args
    ["-h" "--help" "Display this help message." :default false :flag true]
    ["-s" "--source" "Location of your site's source files." :default *source*]
-   ["-u" "--url" "URL representing the site'd root." :default *site-url*]
+   ["-u" "--url" "URL representing the site's root." :default *site-url*]
    ["-t" "--target" "Place to put your generated site." :default *target*]))
 
 (defn -main
   "Application entry point."
   [& args]
+  (println "hello")
   (let [[options trailing usage] (parse args)]
 
     (when (:help options)
       (println usage)
       (System/exit 0))
 
+    ;; Once everything uses "site" get rid of these bindings
     (binding [*source* (.getAbsolutePath (io/as-file (:source options)))
               *target* (.getAbsolutePath (io/as-file (:target options)))
-              *site-url* (if (:url options) (:url options) *site-url*)]
-      (do-run))))
+              *site-url* (:url options)]
+
+      (let [this-site (assoc site
+                        :target-dir *target*
+                        :source-dir *source*
+                        :site-url *site-url*)]
+        ;;
+        ;; Eventually the "site" data structure should represent
+        ;; everything thing needed for work to be done.
+        ;;
+        (do-run this-site)))))
