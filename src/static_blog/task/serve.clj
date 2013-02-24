@@ -18,10 +18,10 @@
       (file-info/wrap-file-info)))
 
 (defn- start-httpd
-  [port docroot]
+  [port docroot url]
   (println " - docroot:" docroot)
   (println " - port:   " port)
-  (println " - url:    " (str  "http://localhost/:" port))
+  (println " - url:    " (str  "http://localhost:" port url "/"))
   (jetty/run-jetty (app docroot) {:port port :join? true}))
 
 (deftype ServeTask []
@@ -30,8 +30,9 @@
     "Serve Task")
   (invoke! [this site]
     (let [port (get-in site [:server :port])
-          docroot (:target-dir site)]
-      (start-httpd port docroot))))
+          docroot (:docroot site)
+          url (:site-url site)]
+      (start-httpd port docroot url))))
 
 (defn mk-task
   []

@@ -89,7 +89,8 @@
 (defn- configured
   [options]
   {:source-dir (utils/full-path (:source options))
-   :target-dir (utils/full-path (:target options))
+   :docroot (utils/full-path (:target options))
+   :target-dir (str (utils/full-path (:target options)) (:url options))
    :site-url (:url options)
    :publish-date (utils/publish-date)})
 

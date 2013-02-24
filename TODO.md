@@ -3,7 +3,8 @@
   * <strike>~~Archives page~~</strike>
 
   * Consider making date stuff finer grained so a template can do
-    interesting things with it.
+    interesting things with it. New vars :year :month :day and an
+    additional value to futz with the pretty-print default.
 
   * <strike>~~Use the markdown file name itself as the
     title.~~</strike>
@@ -18,7 +19,10 @@
 
   * Add an "auto" facility that watches files and regenerates the site
     on every change. If the change is to an asset or article, just
-    copy those over. If it's to a template, re-gen the whole thing.
+    copy those over. If it's to a template, re-gen the whole
+    thing. Watcher threads detect change, throw event into queue,
+    single worker runs the associated task to avoid concurrency
+    issues.
 
   * <strike>~~Make this a one-pass system. Load everything into a data
     structure, then pass it through transforms. No need to
@@ -45,6 +49,6 @@
   * <strike>~~Recognizable assets should have :site-url
     interploated(e.g., js, css, html).~~</strike>
 
-  * If the `-u` url is not empty, make sure the additional
+  * <strike>~~If the `-u` url is not empty, make sure the additional
     subdirectories are appended to "target" so that the "serve"
-    command properly account for the context.
+    command properly account for the context.~~</strike>
