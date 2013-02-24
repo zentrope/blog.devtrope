@@ -32,9 +32,9 @@
   * <strike>~~Rationalize the template var names and the template file
     names.~~</strike>
 
-  * Add a "serve" facility so you can run this on localhost:port and
-    thus not have to use explicit "index.html" references if you don't
-    want to.
+  * <strike>~~Add a "serve" facility so you can run this on
+    localhost:port and thus not have to use explicit "index.html"
+    references if you don't want to.~~</strike>
 
   * <strike>~~Allow static pages (not articles, e.g., contact, about)
     to be markdown, with a template for them as well.~~</strike>
@@ -44,3 +44,7 @@
 
   * <strike>~~Recognizable assets should have :site-url
     interploated(e.g., js, css, html).~~</strike>
+
+  * If the `-u` url is not empty, make sure the additional
+    subdirectories are appended to "target" so that the "serve"
+    command properly account for the context.

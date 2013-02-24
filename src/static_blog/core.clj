@@ -7,7 +7,8 @@
    [static-blog.task.assets :as assets]
    [static-blog.task.pages :as pages]
    [static-blog.task.articles :as articles]
-   [static-blog.task.aggregates :as aggregates])
+   [static-blog.task.aggregates :as aggregates]
+   [static-blog.task.serve :as serve])
   ;;
   (:require
    [clojure.tools.cli :as cli :only [cli]]
@@ -59,15 +60,21 @@
                       (aggregates/mk-task "RSS Feed Task" :feed-page)])
 
 (defn- do-run
-  [site]
+  [site commands]
   (println "\nLocations:")
-  (println " source:" (:source-dir site))
-  (println " target:" (:target-dir site))
-  (println " topurl:" (if (= ""  (:site-url site)) "/" (:site-url site)))
+  (println " - source:" (:source-dir site))
+  (println " - target:" (:target-dir site))
+  (println " - topurl:" (if (= ""  (:site-url site)) "/" (:site-url site)))
 
   (doseq [t tasks]
-    (println "\n" (task/concern t))
+    (println (str "\n" (task/concern t)))
     (task/invoke! t site))
+
+  (when (some #(= :serve %) commands)
+    (let [server (serve/mk-task)]
+      (println (str "\n" (task/concern server)))
+      (task/invoke! server site)))
+
   (println "\nDone."))
 
 (defn- parse
@@ -79,7 +86,7 @@
    ["-u" "--url" "URL representing the site's root." :default site-url]
    ["-t" "--target" "Place to put your generated site." :default target]))
 
-(defn- overrides
+(defn- configured
   [options]
   {:source-dir (utils/full-path (:source options))
    :target-dir (utils/full-path (:target options))
@@ -89,11 +96,14 @@
 (defn -main
   "Application entry point."
   [& args]
-  (println "hello")
+
+  (println "\nHi ho! Hi ho!")
+
   (let [[options trailing usage] (parse args)]
 
     (when (:help options)
       (println usage)
       (System/exit 0))
 
-    (do-run (into site (overrides options)))))
+    (do-run (into site (configured options))
+            (map keyword trailing))))
