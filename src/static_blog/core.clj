@@ -8,7 +8,8 @@
    [static-blog.task.pages :as pages]
    [static-blog.task.articles :as articles]
    [static-blog.task.aggregates :as aggregates]
-   [static-blog.task.serve :as serve])
+   [static-blog.task.serve :as serve]
+   [static-blog.task.auto :as auto])
   ;;
   (:require
    [clojure.tools.cli :as cli :only [cli]]
@@ -44,6 +45,7 @@
            :static-page {:main-template "page.html"
                          :output-page "index.html"}
            ;;
+           :watcher {:wait-time 5000}
            :server {:port 4002}
            })
 
@@ -59,21 +61,26 @@
                       (aggregates/mk-task "Home Page Task" :home-page)
                       (aggregates/mk-task "RSS Feed Task" :feed-page)])
 
+(def ^:private servs [(auto/mk-task)
+                      (serve/mk-task)])
+
+(defn- run
+  [site tasks]
+  (doseq [t tasks]
+    (println (str "\n" (task/concern t)))
+    (task/invoke! t site)))
+
 (defn- do-run
-  [site commands]
+  [site serve?]
   (println "\nLocations:")
   (println " - source:" (:source-dir site))
   (println " - target:" (:target-dir site))
   (println " - topurl:" (if (= ""  (:site-url site)) "/" (:site-url site)))
 
-  (doseq [t tasks]
-    (println (str "\n" (task/concern t)))
-    (task/invoke! t site))
+  (run site tasks)
 
-  (when (some #(= :serve %) commands)
-    (let [server (serve/mk-task)]
-      (println (str "\n" (task/concern server)))
-      (task/invoke! server site)))
+  (when serve?
+    (run site servs))
 
   (println "\nDone."))
 
@@ -107,4 +114,4 @@
       (System/exit 0))
 
     (do-run (into site (configured options))
-            (map keyword trailing))))
+            (some #(= :serve %) (map keyword (map string/lower-case trailing))))))

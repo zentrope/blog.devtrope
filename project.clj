@@ -7,6 +7,6 @@
                  [org.clojure/tools.cli "0.2.2"]
                  [org.pegdown/pegdown "1.2.0"]
                  [ch.qos.logback/logback-classic "1.0.7"]
-                 ;; [ring/ring-core "1.2.0-beta1"]
-                 [ring/ring-jetty-adapter "1.2.0-beta1"]]
+                 [ring/ring-jetty-adapter "1.2.0-beta1"]
+                 [digest "1.3.0"]]
   :main static-blog.core)

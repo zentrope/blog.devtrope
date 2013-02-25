@@ -1,28 +1,29 @@
 # TO DO
 
-  * <strike>~~Archives page~~</strike>
-
   * Consider making date stuff finer grained so a template can do
     interesting things with it. New vars :year :month :day and an
     additional value to futz with the pretty-print default.
 
+  * Allow "html" articles as well as markdown articles. (Mainly
+    because I can't find a multi-markdown processor on the JVM.)
+
+  * Document command-line options, directory structure, template
+    variables, and conventions/assumptions.
+
+  * A task that'll generate a new website for you with all template
+    vars in use at lease somewhere.
+
+  * <strike>~~Archives page~~</strike>
+
   * <strike>~~Use the markdown file name itself as the
     title.~~</strike>
 
-  * Allow "html" articles as well.
-
-  * Document directory structure.
-
-  * Document template variables.
-
-  * Document how minimalist this really is.
-
-  * Add an "auto" facility that watches files and regenerates the site
-    on every change. If the change is to an asset or article, just
-    copy those over. If it's to a template, re-gen the whole
-    thing. Watcher threads detect change, throw event into queue,
-    single worker runs the associated task to avoid concurrency
-    issues.
+  * <strike>~~Add an "auto" facility that watches files and
+    regenerates the site on every change. If the change is to an asset
+    or article, just copy those over. If it's to a template, re-gen
+    the whole thing. Watcher threads detect change, throw event into
+    queue, single worker runs the associated task to avoid concurrency
+    issues.~~</strike>
 
   * <strike>~~Make this a one-pass system. Load everything into a data
     structure, then pass it through transforms. No need to

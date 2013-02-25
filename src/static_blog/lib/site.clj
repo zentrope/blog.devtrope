@@ -1,7 +1,7 @@
 (ns static-blog.lib.site
   ;;
-  ;; Convenience functions for extraction information out
-  ;; of a site-description.
+  ;; Convenience functions for extracting information out of a
+  ;; site-description.
   ;;
   (:require
    [static-blog.lib.utils :as utils]))
@@ -13,6 +13,14 @@
 (defn template-dir
   [site]
   (utils/path-from-keys site :source-dir :template-dir))
+
+(defn page-dir
+  [site]
+  (utils/path-from-keys site :source-dir :page-dir))
+
+(defn asset-dir
+  [site]
+  (utils/path-from-keys site :source-dir :asset-dir))
 
 (defn output-page
   [site page]
