@@ -20,7 +20,10 @@
 
 (def ^:private tasks {:asset [(assets/mk-task)]
                       :page [(pages/mk-task)]
-                      :article [(articles/mk-task)]
+                      :article [(articles/mk-task)
+                                (aggregates/mk-task "Archive Page Task" :archive-page)
+                                (aggregates/mk-task "Home Page Task" :home-page)
+                                (aggregates/mk-task "RSS Feed Task" :feed-page)]
                       :template [(articles/mk-task)
                                  (pages/mk-task)
                                  (aggregates/mk-task "Archive Page Task" :archive-page)

@@ -9,7 +9,8 @@
    [static-blog.task.articles :as articles]
    [static-blog.task.aggregates :as aggregates]
    [static-blog.task.serve :as serve]
-   [static-blog.task.auto :as auto])
+   [static-blog.task.auto :as auto]
+   [static-blog.task.new-site :as new-site])
   ;;
   (:require
    [clojure.tools.cli :as cli :only [cli]]
@@ -21,6 +22,7 @@
            :source-dir nil
            :target-dir nil
            :publish-date nil
+           :new-site-dir nil
            ;;
            :asset-dir "assets"
            :page-dir "pages"
@@ -52,7 +54,7 @@
 (def ^:private cwd (System/getProperty "user.dir"))
 (def ^:private source (utils/path-from-vec cwd "site"))
 (def ^:private target (utils/path-from-vec cwd "pub"))
-(def ^:private site-url (str "file://" target))
+(def ^:private site-url "")
 
 (def ^:private tasks [(assets/mk-task)
                       (pages/mk-task)
@@ -69,6 +71,10 @@
   (doseq [t tasks]
     (println (str "\n" (task/concern t)))
     (task/invoke! t site)))
+
+(defn- new-site
+  [site location]
+  (run site [(new-site/mk-task location)]))
 
 (defn- do-run
   [site serve?]
@@ -89,6 +95,7 @@
   (cli/cli
    args
    ["-h" "--help" "Display this help message." :default false :flag true]
+   ["-g" "--generate" "Generate the skeleton of a new site."]
    ["-s" "--source" "Location of your site's source files." :default source]
    ["-u" "--url" "URL representing the site's root." :default site-url]
    ["-t" "--target" "Place to put your generated site." :default target]))
@@ -111,6 +118,10 @@
 
     (when (:help options)
       (println usage)
+      (System/exit 0))
+
+    (when-let [location (:generate options)]
+      (new-site {} location)
       (System/exit 0))
 
     (do-run (into site (configured options))
