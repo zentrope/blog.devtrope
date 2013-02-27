@@ -4,7 +4,8 @@
   ;; start something new.
   ;;
   (:require
-   [clojure.java.io :as io])
+   [clojure.java.io :as io]
+   [clojure.string :as string])
   ;;
   (:require
    [static-blog.lib.utils :as utils]
@@ -23,6 +24,21 @@
     (.mkdirs (.getParentFile target))
     (io/copy source target)))
 
+(defn- unpack-from-jar
+  [to]
+  (doseq [[fname stream] (utils/find-jar-entries #"scaffold")]
+    (let [path (string/replace fname #"scaffold" "")
+          target (io/as-file(utils/path-from-vec to path))]
+      (println " - writing" target)
+      (.mkdirs (.getParentFile target))
+      (spit target (slurp stream)))))
+
+(defn- unpack-from-fs
+  [to]
+  (let [from (io/as-file (io/resource "scaffold"))]
+      (doseq [file (->> (file-seq from) (filter #(.isFile %)))]
+        (copy file from to))))
+
 (deftype NewSiteTask [to]
   task/Task
 
@@ -30,9 +46,9 @@
     "New Site Task")
 
   (invoke! [this site]
-    (let [from (io/as-file (io/resource "scaffold"))]
-      (doseq [file (->> (file-seq from) (filter #(.isFile %)))]
-        (copy file from to)))))
+    (if (utils/running-in-jar?)
+      (unpack-from-jar to)
+      (unpack-from-fs to))))
 
 (defn mk-task
   [location]

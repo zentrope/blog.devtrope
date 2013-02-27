@@ -68,3 +68,31 @@
         md-extensions (- (Extensions/ALL) (Extensions/HARDWRAPS))
         processor (PegDownProcessor. md-extensions)]
     (merge-template (.markdownToHtml processor raw) data)))
+
+(let [class static_blog.lib.utils__init]
+
+  (defn- find-jar-file
+    []
+    (->>  (.. class (getProtectionDomain) (getCodeSource) (getLocation) (getFile))
+          (java.io.File.)
+          (java.util.jar.JarFile.)))
+
+  (defn running-in-jar?
+    []
+    (try
+      (do (find-jar-file) true)
+      (catch Throwable t
+        false)))
+
+  (defn find-jar-entries
+    "Given a class, find the jar it's running in, then return a tuple
+     with the first term as the relative path to the file, and the
+     second as an input stream to the file. Entries are filtered by
+     names matching the regular expression."
+    [re]
+    (let [jar (find-jar-file)]
+      (->> jar
+           (.entries)
+           (enumeration-seq)
+           (filter #(re-find re (.getName %)))
+           (map #(vector (.getName %) (.getInputStream jar %)))))))

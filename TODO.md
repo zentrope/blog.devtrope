@@ -10,8 +10,8 @@
   * Document command-line options, directory structure, template
     variables, and conventions/assumptions.
 
-  * A task that'll generate a new website for you with all template
-    vars in use at lease somewhere.
+  * <strike>~~A task that'll generate a new website for you with all
+    template vars in use at least somewhere.~~</strike>
 
   * <strike>~~Archives page~~</strike>
 
