@@ -73,11 +73,12 @@
 
   (defn- find-jar-file
     []
-    (->>  (.. class (getProtectionDomain) (getCodeSource) (getLocation) (getFile))
-          (java.io.File.)
-          (java.util.jar.JarFile.)))
+    (->> (.. class (getProtectionDomain) (getCodeSource) (getLocation) (getFile))
+         (java.io.File.)
+         (java.util.jar.JarFile.)))
 
   (defn running-in-jar?
+    "Are we running in a jar?"
     []
     (try
       (do (find-jar-file) true)
@@ -85,10 +86,10 @@
         false)))
 
   (defn find-jar-entries
-    "Given a class, find the jar it's running in, then return a tuple
-     with the first term as the relative path to the file, and the
-     second as an input stream to the file. Entries are filtered by
-     names matching the regular expression."
+    "Find the jar we're running in, then return a tuple with the first
+     term as the relative path to the file, and the second as an input
+     stream to the file. Entries are filtered by names matching the
+     regular expression."
     [re]
     (let [jar (find-jar-file)]
       (->> jar

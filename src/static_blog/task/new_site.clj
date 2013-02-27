@@ -28,7 +28,7 @@
   [to]
   (doseq [[fname stream] (utils/find-jar-entries #"scaffold")]
     (let [path (string/replace fname #"scaffold" "")
-          target (io/as-file(utils/path-from-vec to path))]
+          target (io/as-file (utils/path-from-vec to path))]
       (println " - writing" target)
       (.mkdirs (.getParentFile target))
       (spit target (slurp stream)))))
