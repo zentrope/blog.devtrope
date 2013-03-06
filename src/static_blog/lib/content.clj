@@ -55,7 +55,7 @@
      :article-date (pretty-date-from-file file)
      :article-url permalink
      :article-title (utils/file-name file)
-     :article-text (utils/md->html (slurp file)
+     :article-text (utils/md->html file
                                    :article-url permalink
                                    :site-url url)}))
 

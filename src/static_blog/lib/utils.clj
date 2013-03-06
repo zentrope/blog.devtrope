@@ -1,11 +1,13 @@
 (ns static-blog.lib.utils
-
+  ;;
   (:require
    [clojure.string :as string]
    [clojure.java.io :as io])
-
+  ;;
+  (:require
+   [static-blog.lib.markdown :as markdown])
+  ;;
   (:import
-   [org.pegdown PegDownProcessor Extensions]
    [java.text SimpleDateFormat]))
 
 (def ^:private sep java.io.File/separator)
@@ -63,37 +65,43 @@
 
 (defn md->html
   "Convert markdown source to HTML, merging in template data if provided."
-  [raw & more]
-  (let [data (into {} (apply hash-map more))
-        md-extensions (- (Extensions/ALL) (Extensions/HARDWRAPS))
-        processor (PegDownProcessor. md-extensions)]
-    (merge-template (.markdownToHtml processor raw) data)))
+  [file & more]
+  (let [data (into {} (apply hash-map more))]
+    (merge-template (markdown/as-html file) data)))
 
-(let [class static_blog.lib.utils__init]
+(defn- find-this-class
+  "Return the class of the namespace this function resides in."
+  []
+  (->> (str (namespace ::file-name) "__init")
+       (namespace-munge)
+       (symbol)
+       (resolve)))
 
-  (defn- find-jar-file
-    []
-    (->> (.. class (getProtectionDomain) (getCodeSource) (getLocation) (getFile))
-         (java.io.File.)
-         (java.util.jar.JarFile.)))
+(defn- find-jar-file
+  []
+  (->> (.. (find-this-class)
+           (getProtectionDomain)
+           (getCodeSource)
+           (getLocation)
+           (toURI))
+       (java.io.File.)
+       (java.util.jar.JarFile.)))
 
-  (defn running-in-jar?
-    "Are we running in a jar?"
-    []
-    (try
-      (do (find-jar-file) true)
-      (catch Throwable t
-        false)))
+(defn running-in-jar?
+  "Are we running in a jar?"
+  []
+  (try (do (find-jar-file) true)
+       (catch Throwable t false)))
 
-  (defn find-jar-entries
-    "Find the jar we're running in, then return a tuple with the first
-     term as the relative path to the file, and the second as an input
-     stream to the file. Entries are filtered by names matching the
-     regular expression."
-    [re]
-    (let [jar (find-jar-file)]
-      (->> jar
-           (.entries)
-           (enumeration-seq)
-           (filter #(re-find re (.getName %)))
-           (map #(vector (.getName %) (.getInputStream jar %)))))))
+(defn find-jar-entries
+  "Find the jar we're running in, then return a tuple with the first
+   term as the relative path to the file, and the second as an input
+   stream to the file. Entries are filtered by names matching the
+   regular expression."
+  [re]
+  (let [jar (find-jar-file)]
+    (->> jar
+         (.entries)
+         (enumeration-seq)
+         (filter #(re-find re (.getName %)))
+         (map #(vector (.getName %) (.getInputStream jar %))))))

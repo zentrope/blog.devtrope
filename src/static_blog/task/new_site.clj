@@ -36,8 +36,8 @@
 (defn- unpack-from-fs
   [to]
   (let [from (io/as-file (io/resource "scaffold"))]
-      (doseq [file (->> (file-seq from) (filter #(.isFile %)))]
-        (copy file from to))))
+    (doseq [file (->> (file-seq from) (filter #(.isFile %)))]
+      (copy file from to))))
 
 (deftype NewSiteTask [to]
   task/Task
