@@ -23,7 +23,7 @@
 
 (defn num?
   [s]
-  (try (number? (read-string s))
+  (try (Long/parseLong s)
        (catch Throwable t
          false)))
 

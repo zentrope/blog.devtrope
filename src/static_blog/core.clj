@@ -125,4 +125,5 @@
       (System/exit 0))
 
     (do-run (into site (configured options))
-            (some #(= :serve %) (map keyword (map string/lower-case trailing))))))
+            (some #(= :serve %) (map keyword (map string/lower-case trailing))))
+    (System/exit 0)))
