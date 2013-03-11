@@ -37,7 +37,7 @@
 
 (defn- page-content
   [^java.io.File file]
-  (-> file
+  (-> (slurp file)
       (utils/md->html)
       (utils/merge-template {:site-url (:site-url *site*)})))
 

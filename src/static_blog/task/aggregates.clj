@@ -10,22 +10,27 @@
   (:require
    [static-blog.task.task :as task]
    [static-blog.lib.site :as site]
-   [static-blog.lib.content :as content]
+   [static-blog.lib.posts :as posts]
    [static-blog.lib.utils :as utils]))
 
+(defn- with-markdown
+  [site post]
+  (assoc post :post-text (utils/md->html (:post-body post) :site-url (:site-url site))))
+
 (defn- assemble
-  [template articles]
-  (->> (for [a articles] (utils/merge-template template a))
+  [template site posts]
+  (->> (for [p posts]
+         (utils/merge-template template (with-markdown site p)))
        (string/join "\n\n")))
 
 (defn- publish-all!
   [site page]
   (let [template (site/slurp-template site page :main-template)
         sub-template (site/slurp-template site page :sub-template)
-        articles (content/articles site)
-        data (assoc site :article-list (assemble sub-template articles))
+        posts (reverse (sort-by :post-timestamp (posts/posts site)))
+        data (assoc site :post-list (assemble sub-template site posts))
         target (io/as-file (site/output-page site page))]
-    (.mkdirs (.getParentFile target))
+    (utils/mk-dir target)
     (println " - publishing" target)
     (spit target (utils/merge-template template data))))
 

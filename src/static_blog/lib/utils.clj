@@ -51,6 +51,14 @@
   [text data]
   (reduce (fn [a [k v]] (string/replace a (re-pattern (str k)) (str v))) text data))
 
+(defn mk-dir
+  [location]
+  (let [f (io/as-file location)
+        d (if (.isDirectory f) f (.getParentFile f))
+        result (.mkdirs d)]
+    (when (not result)
+      (ex-info (str "unable to make dir: " d) {}))))
+
 (defn file-name
   "Return the name of a file with path and extension removed."
   [^java.io.File file]
@@ -65,9 +73,9 @@
 
 (defn md->html
   "Convert markdown source to HTML, merging in template data if provided."
-  [file & more]
+  [string & more]
   (let [data (into {} (apply hash-map more))]
-    (merge-template (markdown/as-html file) data)))
+    (merge-template (markdown/as-html string) data)))
 
 (defn- find-this-class
   "Return the class of the namespace this function resides in."

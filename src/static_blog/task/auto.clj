@@ -40,6 +40,7 @@
   [site file]
   (let [fname (utils/full-path file)]
     (cond
+      (.startsWith fname (site/posts-dir site)) :article
       (.startsWith fname (site/article-dir site)) :article
       (.startsWith fname (site/template-dir site)) :template
       (.startsWith fname (site/page-dir site)) :page

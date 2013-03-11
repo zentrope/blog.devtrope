@@ -10,4 +10,4 @@
                  [ring/ring-jetty-adapter "1.2.0-beta1"]
                  [digest "1.4.3"]]
 
-  :main static-blog.core)
+  :main static-blog.main)

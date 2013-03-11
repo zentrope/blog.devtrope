@@ -9,28 +9,37 @@
    [static-blog.task.task :as task]
    [static-blog.lib.utils :as utils]
    [static-blog.lib.site :as site]
-   [static-blog.lib.content :as content]))
+   [static-blog.lib.posts :as posts]))
+
+(defn- mk-path-vector
+  [site post]
+  (-> (str (:post-url post)
+           "/"
+           (get-in site [:article-page :output-page]))
+      (string/split #"/")))
 
 (defn- target-path
-  [site ^java.io.File file]
-  (let [target (:target-dir site)
-        source (:source-dir site)
-        path (utils/rel-parent file source)
-        fname (get-in site [:article-page :output-page])]
-    (utils/path-from-vec target path fname)))
+  [site post]
+  (->> (mk-path-vector site post)
+       (filter (complement empty?))
+       (apply utils/path-from-vec)
+       (utils/path-from-vec (:target-dir site))
+       (io/as-file)))
 
 (defn- publish!
-  [site template article]
-  (let [target (io/as-file (target-path site (:article-file article)))]
+  [site template post]
+  (let [target (target-path site post)
+        content (utils/md->html (:post-body post) :site-url (:site-url site))
+        data (assoc (into site post) :post-text content)]
     (println " - publishing" target)
-    (.mkdirs (.getParentFile target))
-    (spit target (utils/merge-template template article))))
+    (utils/mk-dir target)
+    (spit target (utils/merge-template template data))))
 
-(defn- publish-articles!
+(defn- publish-posts!
   [site]
   (let [template (site/slurp-template site :article-page :main-template)]
-    (doseq [article (content/articles site)]
-      (publish! site template article))))
+    (doseq [post (posts/posts site)]
+      (publish! site template post))))
 
 (deftype ArticlesTask []
   task/Task
@@ -39,7 +48,7 @@
     "Articles Task")
   ;;
   (invoke! [this site]
-    (publish-articles! site)))
+    (publish-posts! site)))
 
 (defn mk-task
   []

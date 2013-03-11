@@ -6,6 +6,10 @@
   (:require
    [static-blog.lib.utils :as utils]))
 
+(defn posts-dir
+  [site]
+  (utils/path-from-keys site :source-dir :posts-dir))
+
 (defn article-dir
   [site]
   (utils/path-from-keys site :source-dir :article-dir))

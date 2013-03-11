@@ -28,20 +28,22 @@
        (filter #(.exists (io/as-file %)))
        (first)))
 
-(defmulti markdown-impl (fn [impl file] impl))
+(defmulti markdown-impl (fn [impl string] impl))
 
 (defmethod markdown-impl :pegdown
-  [_ file]
+  [_ string]
   (let [ext (- (Extensions/ALL) (Extensions/HARDWRAPS))
         processor (PegDownProcessor. ext)]
-    (.markdownToHtml processor (slurp file))))
+    (.markdownToHtml processor string)))
 
 (defmethod markdown-impl :multimarkdown
-  [_ file]
-  (:out (shell/sh (find-binary) "-x" (.getAbsolutePath (io/as-file file)))))
+  [_ string]
+  (:out (shell/sh (find-binary) "-x" :in string))
+;;  (:out (shell/sh (find-binary) "-x" (.getAbsolutePath (io/as-file file))))
+  )
 
 (defn as-html
-  [file]
+  [string]
   (if-let [bin (find-binary)]
-    (markdown-impl :multimarkdown file)
-    (markdown-impl :pegdown file)))
+    (markdown-impl :multimarkdown string)
+    (markdown-impl :pegdown string)))

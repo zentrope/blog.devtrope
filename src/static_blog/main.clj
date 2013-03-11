@@ -1,4 +1,4 @@
-(ns static-blog.core
+(ns static-blog.main
   (:gen-class)
   ;;
   (:require
@@ -28,6 +28,7 @@
            :page-dir "pages"
            :template-dir "templates"
            :article-dir "articles"
+           :posts-dir "posts"
            ;;
            :home-page {:main-template "home.html"
                        :sub-template "home-article.html"
@@ -83,6 +84,7 @@
   (println " - target:" (:target-dir site))
   (println " - topurl:" (if (= ""  (:site-url site)) "/" (:site-url site)))
 
+  ;; (run site [(articles/mk-task)])
   (run site tasks)
 
   (when serve?
