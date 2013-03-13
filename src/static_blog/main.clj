@@ -50,6 +50,7 @@
            ;;
            :watcher {:wait-time 5000}
            :server {:port 4002}
+           :rss-host "http://blog.devtrope.com"
            })
 
 (def ^:private cwd (System/getProperty "user.dir"))
