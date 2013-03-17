@@ -38,9 +38,7 @@
 
 (defmethod markdown-impl :multimarkdown
   [_ string]
-  (:out (shell/sh (find-binary) "-x" :in string))
-;;  (:out (shell/sh (find-binary) "-x" (.getAbsolutePath (io/as-file file))))
-  )
+  (:out (shell/sh (find-binary) "--notes" "--smart" :in string)))
 
 (defn as-html
   [string]
