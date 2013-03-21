@@ -21,12 +21,12 @@
 (def ^:private tasks {:asset [(assets/mk-task)]
                       :page [(pages/mk-task)]
                       :article [(articles/mk-task)
-                                (aggregates/mk-task "Archive Page Task" :archive-page)
+                                (aggregates/mk-task "Catalog Page Task" :archive-page)
                                 (aggregates/mk-task "Home Page Task" :home-page)
                                 (aggregates/mk-task "RSS Feed Task" :feed-page)]
                       :template [(articles/mk-task)
                                  (pages/mk-task)
-                                 (aggregates/mk-task "Archive Page Task" :archive-page)
+                                 (aggregates/mk-task "Catalog Page Task" :archive-page)
                                  (aggregates/mk-task "Home Page Task" :home-page)
                                  (aggregates/mk-task "RSS Feed Task" :feed-page)]})
 
@@ -40,11 +40,10 @@
   [site file]
   (let [fname (utils/full-path file)]
     (cond
-      (.startsWith fname (site/posts-dir site)) :article
-      (.startsWith fname (site/article-dir site)) :article
-      (.startsWith fname (site/template-dir site)) :template
-      (.startsWith fname (site/page-dir site)) :page
-      (.startsWith fname (site/asset-dir site)) :asset
+      (.startsWith fname (site/source-dir-in site :posts)) :article
+      (.startsWith fname (site/source-dir-in site :templates)) :template
+      (.startsWith fname (site/source-dir-in site :pages)) :page
+      (.startsWith fname (site/source-dir-in site :assets)) :asset
       :else :noop)))
 
 (defn- stamp
@@ -94,7 +93,7 @@
 
 (defn- test-for-changes
   [site]
-  (refresh-match! (:source-dir site))
+  (refresh-match! (site/root-dir site))
   (let [diffs (merge(find-difference @last-match @this-match)
                     (find-difference @this-match @last-match))]
     ;;
@@ -125,7 +124,8 @@
   (concern [this]
     "Auto Task")
   (invoke! [this site]
-    (let [source-dir (:source-dir site)]
+    (println "\n" (task/concern this))
+    (let [source-dir (site/root-dir site)]
       (initial-match! source-dir)
       (println " - tracking files in" source-dir)
       (start-watcher site)

@@ -4,34 +4,66 @@
   ;; site-description.
   ;;
   (:require
+   [clojure.string :as string]
    [static-blog.lib.utils :as utils]))
 
-(defn posts-dir
+(def sep java.io.File/separator)
+
+(defn- file-name
+  [^java.io.File file]
+  (-> (.getName file)
+      (string/replace #"[.][^.]+$" "")))
+
+(defn- resolve-home
+  [path]
+  (if (.startsWith path "~")
+    (str (System/getProperty "user.home") (.substring path 1))
+    (str (System/getProperty "user.dir") sep path)))
+
+(defn root-dir
   [site]
-  (utils/path-from-keys site :source-dir :posts-dir))
+  (-> (get-in site [:source :root :dir])
+      (resolve-home)))
 
-(defn article-dir
+(defn target-dir
   [site]
-  (utils/path-from-keys site :source-dir :article-dir))
+  (-> (get-in site [:target :root :dir])
+      (resolve-home)))
 
-(defn template-dir
-  [site]
-  (utils/path-from-keys site :source-dir :template-dir))
+(defn source-dir-in
+  [site key]
+  (str (root-dir site) "/" (get-in site [:source key :dir])))
 
-(defn page-dir
-  [site]
-  (utils/path-from-keys site :source-dir :page-dir))
+(defn page-file-out
+  [site file]
+  (let [fname (.getName file)
+        fpath (.replace (.getAbsolutePath file) (source-dir-in site :pages) (target-dir site))
+        fout (get-in site [:source :templates :page :out])]
+    (str (.replace fpath fname (file-name file)) sep fout)))
 
-(defn asset-dir
-  [site]
-  (utils/path-from-keys site :source-dir :asset-dir))
+(defn post-file-out
+  [site rel-url]
+  (str (target-dir site)
+       (string/join sep (string/split rel-url #"[/]"))
+       sep
+       (get-in site [:source :templates :post :out])))
 
-(defn output-page
-  [site page]
-  (utils/path-from-vec (:target-dir site) (get-in site [page :output-page])))
+(defn aggregate-file-out
+  [site template]
+  (str (target-dir site)
+       sep
+       (get-in site [:source :templates template :out])))
 
-(defn slurp-template
-  [site page template]
-  (->> (get-in site [page template])
-       (utils/path-from-vec (template-dir site))
-       (slurp)))
+(defn- from-template
+  [site template item]
+  (str (source-dir-in site :templates)
+       sep
+       (get-in site [:source :templates template item])))
+
+(defn template
+  [site template]
+  (from-template site template :main))
+
+(defn sub-template
+  [site template]
+  (from-template site template :sub))

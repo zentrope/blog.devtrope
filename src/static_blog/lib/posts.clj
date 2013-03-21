@@ -83,12 +83,17 @@
         (dissoc :post-date)
         (dissoc :post-time))))
 
+(defn- assoc-target
+  [site posts]
+  (for [p posts] (assoc p :post-target (site/post-file-out site (:post-url p)))))
+
 (defn- assoc-permalink
   [site-url posts]
   (for [p posts]
     (let [{:keys [post-slug post-year post-day post-month]} p
           links [site-url "articles" post-year post-month post-day post-slug]]
-      (assoc p :post-url (string/join "/" links)))))
+      (assoc p
+        :post-url (string/join "/" links)))))
 
 ;;-----------------------------------------------------------------------------
 ;; Public
@@ -97,6 +102,7 @@
 (defn posts
   "Returns a list of metadata hashmaps for each post."
   [site]
-  (->> (sources (io/as-file (site/posts-dir site)))
+  (->> (sources (io/as-file (site/source-dir-in site :posts)))
        (assoc-time)
-       (assoc-permalink (:site-url site))))
+       (assoc-permalink (:site-url site))
+       (assoc-target site)))

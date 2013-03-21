@@ -1,67 +1,25 @@
 (ns static-blog.task.pages
+  ;;
+  ;; Publishes static pages (about, contact, etc).
+  ;;
   (:require
    [clojure.java.io :as io]
    [clojure.string :as string]
    [static-blog.task.task :as task]
+   [static-blog.lib.site :as site]
    [static-blog.lib.utils :as utils]))
 
-(def ^{:private true :dynamic true} *site* {})
+(defn- build [site file]
+  {:source file
+   :target (site/page-file-out site file)
+   :page-content (-> (slurp file) (utils/md->html :site-url (:site-url site)))
+   :page-title (string/capitalize (utils/file-name file))})
 
-(defn- page-dir
-  []
-  (utils/path-from-keys *site* :source-dir :page-dir))
-
-(defn- template-dir
-  []
-  (utils/path-from-keys *site* :source-dir :template-dir))
-
-(defn- template
-  []
-  (slurp (utils/path-from-vec (template-dir)
-                              (get-in *site* [:static-page :main-template]))))
-
-(defn- output-page
-  []
-  (get-in *site* [:static-page :output-page]))
-
-(defn- page-title
-  [^java.io.File file]
-  (string/capitalize (utils/file-name file)))
-
-(defn- page-target
-  [file]
-  (utils/path-from-vec (:target-dir *site*)
-                       (utils/rel-parent file (page-dir))
-                       (utils/file-name file)
-                       (output-page)))
-
-(defn- page-content
-  [^java.io.File file]
-  (-> (slurp file)
-      (utils/md->html)
-      (utils/merge-template {:site-url (:site-url *site*)})))
-
-(defn- build-page
-  [^java.io.File file]
-  {:site-url (:site-url *site*)
-   :page-title (page-title file)
-   :page-content (page-content file)
-   :target (page-target file)})
-
-(defn- pages
-  []
-  (->> (io/as-file (page-dir))
+(defn- pages [site]
+  (->> (io/as-file (site/source-dir-in site :pages))
        (file-seq)
        (filter #(.isFile %))
-       (map build-page)))
-
-(defn- publish-pages!
-  []
-  (doseq [{:keys [page-title target page-content] :as page} (pages)]
-    (let [out (io/as-file target)]
-      (println " - writing" out)
-      (.mkdirs (.getParentFile out))
-      (spit out (utils/merge-template (template) page)))))
+       (map (partial build site))))
 
 (deftype PagesTask []
   task/Task
@@ -70,8 +28,13 @@
     "Pages Task")
   ;;
   (invoke! [this site]
-    (binding [*site* site]
-      (publish-pages!))))
+    (println "\n" (task/concern this))
+    (let [template (slurp (site/template site :page))]
+      (doseq [{:keys [page-title target page-content] :as page} (pages site)]
+        (let [out (io/as-file target)]
+          (println " - publishing" out)
+          (.mkdirs (.getParentFile out))
+          (spit out (utils/merge-template template (into site page))))))))
 
 (defn mk-task
   []

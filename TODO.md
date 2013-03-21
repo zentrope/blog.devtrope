@@ -1,8 +1,9 @@
 # TO DO
 
-  * Consider making date stuff finer grained so a template can do
-    interesting things with it. New vars :year :month :day and an
-    additional value to futz with the pretty-print default.
+  * <strike>~~Consider making date stuff finer grained so a template
+    can do interesting things with it. New vars :year :month :day and
+    an additional value to futz with the pretty-print
+    default.~~</strike>
 
   * Allow "html" articles as well as markdown articles. (Mainly
     because I can't find a multi-markdown processor on the JVM.)

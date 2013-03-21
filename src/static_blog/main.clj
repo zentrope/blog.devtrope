@@ -13,120 +13,44 @@
    [static-blog.task.new-site :as new-site])
   ;;
   (:require
-   [clojure.tools.cli :as cli :only [cli]]
+   [clojure.edn :as edn :only [read-string]]
    [clojure.string :as string]
-   [clojure.pprint :as pp]
    [clojure.java.io :as io]))
 
-(def site {:site-url nil
-           :source-dir nil
-           :target-dir nil
-           :publish-date nil
-           :new-site-dir nil
-           ;;
-           :asset-dir "assets"
-           :page-dir "pages"
-           :template-dir "templates"
-           :article-dir "articles"
-           :posts-dir "posts"
-           ;;
-           :home-page {:main-template "home.html"
-                       :sub-template "home-article.html"
-                       :output-page "index.html"}
-           ;;
-           :archive-page {:main-template "archive.html"
-                          :sub-template "archive-article.html"
-                          :output-page "archive/index.html"}
-           ;;
-           :feed-page {:main-template "feed.rss"
-                       :sub-template "feed-article.rss"
-                       :output-page "feeds/rss.xml"}
-           ;;
-           :article-page {:main-template "article.html"
-                          :output-page "index.html"}
-           ;;
-           :static-page {:main-template "page.html"
-                         :output-page "index.html"}
-           ;;
-           :watcher {:wait-time 5000}
-           :server {:port 4002}
-           :rss-host "http://blog.devtrope.com"
-           })
+(defn- tasks
+  []
+  [(assets/mk-task)
+   (pages/mk-task)
+   (articles/mk-task)
+   (aggregates/mk-task "Catalog Page Task" :catalog)
+   (aggregates/mk-task "Home Page Task" :home)
+   (aggregates/mk-task "RSS Feed Task" :feed)])
 
-(def ^:private cwd (System/getProperty "user.dir"))
-(def ^:private source (utils/path-from-vec cwd "site"))
-(def ^:private target (utils/path-from-vec cwd "pub"))
-(def ^:private site-url "")
-
-(def ^:private tasks [(assets/mk-task)
-                      (pages/mk-task)
-                      (articles/mk-task)
-                      (aggregates/mk-task "Archive Page Task" :archive-page)
-                      (aggregates/mk-task "Home Page Task" :home-page)
-                      (aggregates/mk-task "RSS Feed Task" :feed-page)])
-
-(def ^:private servs [(auto/mk-task)
-                      (serve/mk-task)])
-
-(defn- run
-  [site tasks]
-  (doseq [t tasks]
-    (println (str "\n" (task/concern t)))
-    (task/invoke! t site)))
-
-(defn- new-site
-  [site location]
-  (run site [(new-site/mk-task location)]))
-
-(defn- do-run
-  [site serve?]
-  (println "\nLocations:")
-  (println " - source:" (:source-dir site))
-  (println " - target:" (:target-dir site))
-  (println " - topurl:" (if (= ""  (:site-url site)) "/" (:site-url site)))
-
-  ;; (run site [(articles/mk-task)])
-  (run site tasks)
-
-  (when serve?
-    (run site servs))
-
-  (println "\nDone."))
-
-(defn- parse
+(defn- serve?
   [args]
-  (cli/cli
-   args
-   ["-h" "--help" "Display this help message." :default false :flag true]
-   ["-g" "--generate" "Generate the skeleton of a new site."]
-   ["-s" "--source" "Location of your site's source files." :default source]
-   ["-u" "--url" "URL representing the site's root." :default site-url]
-   ["-t" "--target" "Place to put your generated site." :default target]))
+  (not (empty? (filter #(= % "serve") args))))
 
-(defn- configured
-  [options]
-  {:source-dir (utils/full-path (:source options))
-   :docroot (utils/full-path (:target options))
-   :target-dir (str (utils/full-path (:target options)) (:url options))
-   :site-url (:url options)
-   :publish-date (utils/publish-date)})
+(defn- acquire-site-info
+  []
+  (let [[_ name domain & config] (edn/read-string (slurp "site.clj"))]
+    (-> (apply hash-map config)
+        (assoc :site-http domain
+               :site-name name
+               :site-url ""
+               :publish-date (utils/publish-date)))))
 
 (defn -main
-  "Application entry point."
   [& args]
-
-  (println "\nHi ho! Hi ho!")
-
-  (let [[options trailing usage] (parse args)]
-
-    (when (:help options)
-      (println usage)
-      (System/exit 0))
-
-    (when-let [location (:generate options)]
-      (new-site {} location)
-      (System/exit 0))
-
-    (do-run (into site (configured options))
-            (some #(= :serve %) (map keyword (map string/lower-case trailing))))
-    (System/exit 0)))
+  (println ":: the-static-blog ::")
+  (try
+    (let [site (acquire-site-info)]
+     (doseq [t (tasks)]
+       (task/invoke! t site))
+     (when (serve? args)
+       (task/invoke! (auto/mk-task) site)
+       (task/invoke! (serve/mk-task) site)))
+    (catch Throwable t
+      (println "\nERROR:" t))
+    (finally
+      (println "\nDone.")
+      (System/exit 0))))

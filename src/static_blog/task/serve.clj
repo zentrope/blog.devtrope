@@ -4,6 +4,7 @@
   ;; running on a "real" site.
   ;;
   (:require
+   [static-blog.lib.site :as site]
    [static-blog.task.task :as task])
   ;;
   (:require
@@ -29,8 +30,9 @@
   (concern [this]
     "Serve Task")
   (invoke! [this site]
+    (println "\n" (task/concern this))
     (let [port (get-in site [:server :port])
-          docroot (:docroot site)
+          docroot (site/target-dir site)
           url (:site-url site)]
       (start-httpd port docroot url))))
 

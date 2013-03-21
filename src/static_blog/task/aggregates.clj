@@ -1,6 +1,7 @@
 (ns static-blog.task.aggregates
   ;;
-  ;; For generating pages with articles mixed in (rss, home, archive, etc).
+  ;; For generating pages with articles mixed in (rss, home, archive,
+  ;; etc).
   ;;
   (:require
    [clojure.string :as string]
@@ -25,20 +26,21 @@
 
 (defn- publish-all!
   [site page]
-  (let [template (site/slurp-template site page :main-template)
-        sub-template (site/slurp-template site page :sub-template)
+  (let [template (slurp (site/template site page))
+        sub-template (slurp (site/sub-template site page))
         posts (reverse (sort-by :post-timestamp (posts/posts site)))
         data (assoc site :post-list (assemble sub-template site posts))
-        target (io/as-file (site/output-page site page))]
+        target (io/as-file (site/aggregate-file-out site page))]
     (utils/mk-dir target)
     (println " - publishing" target)
-    (spit target (utils/merge-template template data))))
+   (spit target (utils/merge-template template data))))
 
 (deftype AggregatesTask [desc page]
   task/Task
   (concern [this]
     desc)
   (invoke! [this site]
+    (println "\n" (task/concern this))
     (publish-all! site page)))
 
 (defn mk-task
