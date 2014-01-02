@@ -1,15 +1,24 @@
 # TO DO
 
+## Pending
+
+ - [ ] Limit number of articles on feed and home page, but not archive.
+
+ - [ ] Documentation (README.md, at least)
+
+ - [ ] Use nio2 filewatcher for monitoring changes
+
+ - [ ] Properly quote regexes
+
+ - [ ] Document command-line options, directory structure, template
+       variables, and conventions/assumptions.
+
+## Done
+
   * <strike>~~Consider making date stuff finer grained so a template
     can do interesting things with it. New vars :year :month :day and
     an additional value to futz with the pretty-print
     default.~~</strike>
-
-  * Allow "html" articles as well as markdown articles. (Mainly
-    because I can't find a multi-markdown processor on the JVM.)
-
-  * Document command-line options, directory structure, template
-    variables, and conventions/assumptions.
 
   * <strike>~~A task that'll generate a new website for you with all
     template vars in use at least somewhere.~~</strike>
