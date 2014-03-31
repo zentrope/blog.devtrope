@@ -1,7 +1,0 @@
-  <item>
-    <title>:article-title</title>
-    <description><![CDATA[:article-text]]></description>
-    <link>:article-url</link>
-    <guid>:article-url</guid>
-    <pubDate>:article-machine-date</pubDate>
-  </item>

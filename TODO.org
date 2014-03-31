@@ -1,65 +1,22 @@
-#+startup: overview
-#+startup: indent
+#+startup: showall
 #+title: TO DO
 
-* Pending
+* Plans
 
- - [ ] Limit number of articles on feed and home page, but not archive.
+The basic plan with this re-write is to simplify the entire system
+down to a bare minimum. I'm also going to assume that the posts are
+stored with the code, so no separation of app from data anymore.
 
- - [ ] Documentation (README.md, at least)
+ - [X] Store posts in resources directory
+ - [X] Store pages in the resources directory.
+ - [X] Pages and posts have :type metadata as first line.
+ - [ ] Revise post metadata (shorten, iso 8601 dates, etc).
+ - [ ] Read in and properly sort files.
+ - [ ] HTML is generated with Hiccup (no templates).
+ - [ ] Generate index page (first page of site).
+ - [ ] Generate post pages (main content).
+ - [ ] Non-post pages are sections at bottom of index.
+ - [ ] CSS style with fixed header footer.
+ - [ ] Allow org-mode posts.
 
- - [ ] Use nio2 filewatcher for monitoring changes
-
- - [ ] Properly quote regexes
-
- - [ ] Document command-line options, directory structure, template
-   variables, and conventions/assumptions.
-
-
-* Done
-
- - [X] Consider making date stuff finer grained so a template can do
-   interesting things with it. New vars :year :month :day and an
-   additional value to futz with the pretty-print default.
-
- - [X] A task that'll generate a new website for you with all
-   template vars in use at least somewhere.
-
- - [X] Archives page
-
- - [X] Use the markdown file name itself as the title.
-
- - [X] Add an "auto" facility that watches files and regenerates the
-   site on every change. If the change is to an asset or article,
-   just copy those over. If it's to a template, re-gen the whole
-   thing. Watcher threads detect change, throw event into queue,
-   single worker runs the associated task to avoid concurrency
-   issues.
-
- - [X] Make this a one-pass system. Load everything into a data
-   structure, then pass it through transforms. No need to
-   differentiate between "posts" (shown in the index page) and
-   "articles" (each on their own page), etc.
-
- - [X] Generalize template interpolation: just a map and a blob of
-   text. Replace occurances of keys in blob with values in map.
-
- - [X] Rationalize the template var names and the template file
-   names.
-
- - [X] Add a "serve" facility so you can run this on localhost:port
-   and thus not have to use explicit "index.html" references if you
-   don't want to.
-
- - [X] Allow static pages (not articles, e.g., contact, about) to be
-   markdown, with a template for them as well.
-
- - [X] Computed pages should be resources (/contact) not file
-   (contact.html).
-
- - [X] Recognizable assets should have :site-url interploated(e.g.,
-   js, css, html).
-
- - [X] If the `-u` url is not empty, make sure the additional
-   subdirectories are appended to "target" so that the "serve"
-   command properly account for the context.
+That about does it, I think.
