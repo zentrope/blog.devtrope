@@ -10,13 +10,17 @@ stored with the code, so no separation of app from data anymore.
  - [X] Store posts in resources directory
  - [X] Store pages in the resources directory.
  - [X] Pages and posts have :type metadata as first line.
- - [ ] Revise post metadata (shorten, iso 8601 dates, etc).
- - [ ] Read in and properly sort files.
- - [ ] HTML is generated with Hiccup (no templates).
- - [ ] Generate index page (first page of site).
- - [ ] Generate post pages (main content).
- - [ ] Non-post pages are sections at bottom of index.
- - [ ] CSS style with fixed header footer.
+ - [X] Revise post metadata (shorten, iso 8601 dates, etc).
+ - [X] Read in and properly sort files.
+ - [X] HTML is generated with Hiccup (no templates).
+ - [X] Generate index page (first page of site).
+ - [X] Generate post pages (main content).
+ - [X] Non-post pages are sections at bottom of index.
+ - [X] CSS style with fixed header footer.
+ - [X] Script/css style management.
+ - [ ] Image asset management.
+ - [ ] Final fixes (for first pub).
+ - [ ] Responsive design.
  - [ ] Allow org-mode posts.
 
 That about does it, I think.
