@@ -1,0 +1,156 @@
+html, body {
+  background-color: white;
+  font-family: garamond, baskerville, georgia, serif;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: #369;
+}
+
+a:hover {
+  color: darkred;
+}
+
+header {
+  position: relative;
+  height: 50px;
+  border-bottom: 1px solid #aaa;
+  margin: 0 auto;
+  width: 650px;
+}
+
+header div.title {
+  position: absolute;
+  bottom: 2px;
+  left: 0px;
+  font-size: 15pt;
+  font-weight: normal;
+  font-style: italic;
+  letter-spacing: 2px;
+}
+
+header div.author {
+  position: absolute;
+  bottom: 2px;
+  right: 0px;
+  font-size: 15pt;
+  font-weight: normal;
+  font-style: italic;
+  color: #888;
+}
+
+footer {
+  position: relative;
+  height: 50px;
+  border-top: 1px solid #aaa;
+  margin: 0 auto;
+  width: 650px;
+  margin-top: 20px;
+}
+
+footer div.copyright {
+  position: absolute;
+  right: 0px;
+  left: 0px;
+  top: 5px;
+  font-size: 12pt;
+  letter-spacing: 1.3px;
+  color: #555;
+  text-align: center;
+}
+
+#container {
+  bottom: 30px;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  padding-bottom: 24px;
+}
+
+section.posts {
+  margin: 0 auto;
+  width: 650px;
+}
+
+section.posts h1 {
+  font-size: 20pt;
+  font-weight: normal;
+  letter-spacing: 2px;
+  color: #555;
+}
+
+section.posts p, section.page p {
+  font-size: 15pt;
+  text-align: justify;
+  line-height: 1.3em;
+}
+
+section.posts ul, section.page ul {
+  list-style: none;
+  padding-left: 12px;
+}
+
+section.posts li, section.page li {
+  font-size: 15pt;
+  margin-bottom: 6pt;
+
+}
+
+section.posts span.date {
+  color: #888 !important;
+  margin-right: 12px;
+}
+
+section.page {
+  margin: 0 auto;
+  width: 650px;
+}
+
+section.page h1 {
+  font-size: 20pt;
+  font-weight: normal;
+  letter-spacing: 2px;
+  color: #555;
+  margin-top: 24pt;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+article {
+  margin: 0 auto;
+  width: 650px;
+}
+
+article h1 {
+  font-weight: normal;
+  font-size: 20pt;
+  letter-spacing: 2px;
+  color: #555;
+  margin-top: 24pt;
+}
+
+article h2 {
+  font-weight: normal;
+  font-size: 18pt;
+  letter-spacing: 2px;
+  margin-top: 24pt;
+  color: #555;
+}
+
+article section.date {
+  font-variant: small-caps;
+  font-size: 14pt;
+  color: darkred;
+}
+
+article section.body p {
+  font-size: 15pt;
+  text-align: justify;
+  line-height: 1.3em;
+}
+
+article section.body {
+}

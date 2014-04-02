@@ -1,5 +1,5 @@
 {:type :post
- :when "2013-03-15 12:45"
+ :when "2013-03-15"
  :slug "prototype-the-production-of-software"
  :title "On prototyping the production of software"
  :tags "software"

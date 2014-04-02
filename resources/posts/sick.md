@@ -1,5 +1,5 @@
 {:type :post
- :when "2012-12-01 13:01"
+ :when "2012-12-01"
  :slug "sick"
  :title "On the distortion of the senses while sick"
  :tags "life"

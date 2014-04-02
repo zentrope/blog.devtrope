@@ -1,5 +1,5 @@
 {:type :post
- :when "2009-07-05 13:01"
+ :when "2009-07-05"
  :slug "erlang-and-jobs"
  :title "On fringe languages and the job market"
  :tags "software"

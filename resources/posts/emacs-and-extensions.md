@@ -1,5 +1,5 @@
 {:type :post
- :when "2012-09-02 13:01"
+ :when "2012-09-02"
  :slug "emacs-and-extensions"
  :title "On committing to Emacs"
  :tags "emacs"

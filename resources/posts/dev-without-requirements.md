@@ -1,5 +1,5 @@
 {:type :post
- :when "2009-09-20 13:01"
+ :when "2009-09-20"
  :slug "dev-without-requirements"
  :title "On development without clear requirements"
  :tags "software"

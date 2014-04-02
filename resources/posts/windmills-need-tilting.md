@@ -1,5 +1,5 @@
 {:type :post
- :when "2012-09-23 13:01"
+ :when "2012-09-23"
  :slug "windmills-need-tilting"
  :title "On the need for tilting at windmills"
  :tags "software"

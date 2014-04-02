@@ -1,5 +1,5 @@
 {:type :post
- :when "2013-02-03 13:01"
+ :when "2013-02-03"
  :slug "the-python-event"
  :title "On discovering a message-based architecture"
  :tags "software"

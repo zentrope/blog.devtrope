@@ -1,5 +1,5 @@
 {:type :post
- :when "2009-07-23 13:01"
+ :when "2009-07-23"
  :slug "case-study-asynchronous-rest-3"
  :title "On the operational details (3 of 3)"
  :tags "software"

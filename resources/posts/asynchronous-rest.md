@@ -1,5 +1,5 @@
 {:type :post
- :when "2009-07-09 13:01"
+ :when "2009-07-09"
  :slug "initial-thoughts-on-asynchronous-rest"
  :title "On asynchronous REST interfaces"
  :tags "software"

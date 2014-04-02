@@ -1,5 +1,5 @@
 {:type :post
- :when "2009-07-11 13:01"
+ :when "2009-07-11"
  :slug "case-study-asynchronous-rest-1"
  :title "On the problem to be solved (1 of 3)"
  :tags "software"
@@ -174,6 +174,6 @@ That architecture, with all the unintended benefits it provided, is
 the whole point of this long exposition, and will be the main subject
 matter in the [next article][part2].
 
-[part1]: :site-url/articles/2009/07/11/case-study-asynchronous-rest-1
-[part2]: :site-url/articles/2009/07/15/case-study-asynchronous-rest-2
-[part3]: :site-url/articles/2009/07/23/case-study-asynchronous-rest-3
+[part1]: /post/case-study-asynchronous-rest-1/
+[part2]: /post/case-study-asynchronous-rest-2/
+[part3]: /post/case-study-asynchronous-rest-3/

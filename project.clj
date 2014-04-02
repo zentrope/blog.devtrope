@@ -3,8 +3,6 @@
   :url "https://github.com/zentrope/zentrope-sb"
   :license {:name "EPL" :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/tools.logging "0.2.6"]
-                 [ch.qos.logback/logback-classic "1.1.1"]
                  [hiccup "1.0.5"]]
   :jvm-opts ["-Dapple.awt.UIElement=true"]
   :min-lein-version "2.3.4"

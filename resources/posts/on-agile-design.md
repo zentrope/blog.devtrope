@@ -1,5 +1,5 @@
 {:type :post
- :when "2013-11-09 15:00"
+ :when "2013-11-09"
  :slug "design-and-the-agile-process"
  :title "On design and the agile process"
  :tags "software"
