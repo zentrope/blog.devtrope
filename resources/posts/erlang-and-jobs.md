@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2009-07-05"
- :post-time "13:01"
- :post-slug "erlang-and-jobs"
- :post-title "On fringe languages and the job market"
- :post-tags "software"
- :post-publish? true}
+ :when "2009-07-05 13:01"
+ :slug "erlang-and-jobs"
+ :title "On fringe languages and the job market"
+ :tags "software"
+ :publish? true}
 
 People in my line of work (writing distributed, network applications)
 seem to be afraid of [Erlang](http://www.erlang.org/doc/

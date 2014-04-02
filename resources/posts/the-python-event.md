@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2013-02-03"
- :post-time "13:01"
- :post-slug "the-python-event"
- :post-title "On discovering a message-based architecture"
- :post-tags "software"
- :post-publish? true}
+ :when "2013-02-03 13:01"
+ :slug "the-python-event"
+ :title "On discovering a message-based architecture"
+ :tags "software"
+ :publish? true}
 
 This is the story of how I became interested in basing all distributed
 systems on asynchronous messaging.

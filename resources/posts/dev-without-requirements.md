@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2009-09-20"
- :post-time "13:01"
- :post-slug "dev-without-requirements"
- :post-title "On development without clear requirements"
- :post-tags "software"
- :post-publish? true}
+ :when "2009-09-20 13:01"
+ :slug "dev-without-requirements"
+ :title "On development without clear requirements"
+ :tags "software"
+ :publish? true}
 
 ## a bit of history...
 

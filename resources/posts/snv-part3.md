@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2009-07-23"
- :post-time "13:01"
- :post-slug "case-study-asynchronous-rest-3"
- :post-title "On the operational details (3 of 3)"
- :post-tags "software"
- :post-publish? true}
+ :when "2009-07-23 13:01"
+ :slug "case-study-asynchronous-rest-3"
+ :title "On the operational details (3 of 3)"
+ :tags "software"
+ :publish? true}
 
 ## overview
 

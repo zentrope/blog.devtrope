@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2013-03-15"
- :post-time "12:45"
- :post-slug "prototype-the-production-of-software"
- :post-title "On prototyping the production of software"
- :post-tags "software"
- :post-publish? true}
+ :when "2013-03-15 12:45"
+ :slug "prototype-the-production-of-software"
+ :title "On prototyping the production of software"
+ :tags "software"
+ :publish? true}
 
 When you want to put something in front of a customer or stake holder,
 you make a mock-up or a functioning prototype. The prototype teaches

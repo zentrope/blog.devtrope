@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2009-07-11"
- :post-time "13:01"
- :post-slug "case-study-asynchronous-rest-1"
- :post-title "On the problem to be solved (1 of 3)"
- :post-tags "software"
- :post-publish? true}
+ :when "2009-07-11 13:01"
+ :slug "case-study-asynchronous-rest-1"
+ :title "On the problem to be solved (1 of 3)"
+ :tags "software"
+ :publish? true}
 
 ## general problem
 

@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2012-09-02"
- :post-time "13:01"
- :post-slug "emacs-and-extensions"
- :post-title "On committing to Emacs"
- :post-tags "emacs"
- :post-publish? true}
+ :when "2012-09-02 13:01"
+ :slug "emacs-and-extensions"
+ :title "On committing to Emacs"
+ :tags "emacs"
+ :publish? true}
 
 I like to use lots of programming editors and never end up sticking
 with any particular one for long. All of them are interesting in one

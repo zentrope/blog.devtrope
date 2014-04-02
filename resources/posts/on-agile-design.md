@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2013-11-09"
- :post-time "3:00"
- :post-slug "design-and-the-agile-process"
- :post-title "On design and the agile process"
- :post-tags "software"
- :post-publish? true}
+ :when "2013-11-09 15:00"
+ :slug "design-and-the-agile-process"
+ :title "On design and the agile process"
+ :tags "software"
+ :publish? true}
 
 I think I've finally figured out what bugs me about Agile software
 development, or whatever it's called when it's institutionalized at a

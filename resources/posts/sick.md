@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2012-12-01"
- :post-time "13:01"
- :post-slug "sick"
- :post-title "On the distortion of the senses while sick"
- :post-tags "life"
- :post-publish? true}
+ :when "2012-12-01 13:01"
+ :slug "sick"
+ :title "On the distortion of the senses while sick"
+ :tags "life"
+ :publish? true}
 
 I was sick yesterday. Too sick to stay at work. Too sick to do
 anything other than sleep or occasionally think about listening to a

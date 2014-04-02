@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2009-07-09"
- :post-time "13:01"
- :post-slug "initial-thoughts-on-asynchronous-rest"
- :post-title "On asynchronous REST interfaces"
- :post-tags "software"
- :post-publish? true}
+ :when "2009-07-09 13:01"
+ :slug "initial-thoughts-on-asynchronous-rest"
+ :title "On asynchronous REST interfaces"
+ :tags "software"
+ :publish? true}
 
 Tim Bray's [article][tb] got me thinking about REST and about
 synchronous vs asynchronous interfaces.

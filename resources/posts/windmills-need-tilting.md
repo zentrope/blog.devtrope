@@ -1,10 +1,9 @@
 {:type :post
- :post-date "2012-09-23"
- :post-time "13:01"
- :post-slug "windmills-need-tilting"
- :post-title "On the need for tilting at windmills"
- :post-tags "software"
- :post-publish? true}
+ :when "2012-09-23 13:01"
+ :slug "windmills-need-tilting"
+ :title "On the need for tilting at windmills"
+ :tags "software"
+ :publish? true}
 
 ## scene
 
