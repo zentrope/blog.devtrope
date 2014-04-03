@@ -16,7 +16,7 @@ show your manager. He likes it and shows the director. The director
 likes it and shows the vice president. The vice president says no, and
 that's the end of that.
 
-![Quixote is our Hero](:site-url/pix/picasso-quixote.jpg)
+![Quixote is Our Hero](/pix/picasso-quixote.jpg)
 
 The idea doesn't really meet a business need, isn't aligned with the
 direction of the business, or, perhaps, he just doesn't get it or

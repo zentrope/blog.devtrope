@@ -1,11 +1,14 @@
 (ns blog.main
   (:gen-class)
+  (:refer-clojure :exclude [replace])
   (:require
     [clojure.edn :as edn :only [read-string]]
-    [clojure.string :as string]
+    [clojure.string :as string :refer [replace]]
     [clojure.java.io :as io]
     [clojure.java.shell :as shell]
     [hiccup.page :refer [html5 include-css]]))
+
+;; (def ^:private rfc822 (SimpleDateFormat. "EEE, dd MMM yyyy HH:mm:ss ZZZZ"))
 
 (defn delete-file-recursively!
   [f]
@@ -14,6 +17,17 @@
       (doseq [child (.listFiles f)]
         (delete-file-recursively! child)))
     (io/delete-file f)))
+
+(defn copy-dir!
+  [from to]
+  (let [[top & files] (file-seq from)
+        root-path (str (.getPath top) "/")]
+    (doseq [f files]
+      (let [dest (io/file to (replace (.getPath f) root-path ""))]
+        (.mkdirs (.getParentFile dest))
+        (when (.isFile f)
+          (println " - " (.getPath dest))
+          (io/copy f dest))))))
 
 (defn- markdown!
   [string]
@@ -27,6 +41,7 @@
     [:meta {:charset "utf-8"}]
     [:meta {:http-quiv "X-UA-Compatible" :content "IE=edge"}]
     [:link {:rel "shortcut icon" :href "favicon.ico"}]
+    (include-css "http://fonts.googleapis.com/css?family=EB+Garamond&subset=latin,latin-ext")
     (include-css "/style.css")]
    [:body
     [:header
@@ -102,14 +117,13 @@
     ;;
     (when (.exists root)
       (delete-file-recursively! root))
+    ;;
     (.mkdirs root)
     ;;
     (spit (io/file root  "index.html") (index-page posts pages))
     ;;
-    (doseq [asset (resource-file-seq "assets")]
-      (let [target (io/file root (.getName asset))]
-        (println " - " (.getPath target))
-        (io/copy asset target)))
+    (copy-dir! (io/file (io/resource "assets"))
+               root)
     ;;
     (doseq [post posts]
       (let [html (post-page (:title post) (:when post) (markdown! (:text post)))

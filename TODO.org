@@ -7,6 +7,8 @@ The basic plan with this re-write is to simplify the entire system
 down to a bare minimum. I'm also going to assume that the posts are
 stored with the code, so no separation of app from data anymore.
 
+** Before re-publication
+
  - [X] Store posts in resources directory
  - [X] Store pages in the resources directory.
  - [X] Pages and posts have :type metadata as first line.
@@ -18,8 +20,13 @@ stored with the code, so no separation of app from data anymore.
  - [X] Non-post pages are sections at bottom of index.
  - [X] CSS style with fixed header footer.
  - [X] Script/css style management.
- - [ ] Image asset management.
+ - [X] Nice garamond-like web font of some sort.
+ - [X] Image asset management.
+ - [ ] RSS feed generation.
  - [ ] Final fixes (for first pub).
+
+** After re-publication
+
  - [ ] Responsive design.
  - [ ] Allow org-mode posts.
 

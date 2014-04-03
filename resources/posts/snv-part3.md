@@ -150,25 +150,44 @@ On installation or update, the <small>RPM</small> packages:
 
 * set up HTTP Basic Authentication,
 
-and so on and so forth. In other words, installing the <small>RPM</small>s turned a commodity, standard-ops RedHat Linux machine into a Serial Number Validation machine without any user intervention.
+and so on and so forth. In other words, installing the
+<small>RPM</small>s turned a commodity, standard-ops RedHat Linux
+machine into a Serial Number Validation machine without any user
+intervention.
 
-The slightly-modified RedHat installed by the operations group had `apt-get` installed and pointed to a corporate repository for Linux, and so all we had to do in terms of "manual" configuration was add a line to the `apt-get` config file to point to our own repository.
+The slightly-modified RedHat installed by the operations group had
+`apt-get` installed and pointed to a corporate repository for Linux,
+and so all we had to do in terms of "manual" configuration was add a
+line to the `apt-get` config file to point to our own repository.
 
 From then on, deploying code for the first time was a simple:
 
     apt-get install snv
 
-with `snv` being a meta package which depended on the Apache config package, Apache itself, Java, our services, and so on. The dependencies were arranged such that everything was installed in the correct order.
+with `snv` being a meta package which depended on the Apache config
+package, Apache itself, Java, our services, and so on. The
+dependencies were arranged such that everything was installed in the
+correct order.
 
 To upgrade to new versions of the service:
 
     apt-get dist-upgrade
 
-and that was all there was to it. This worked for test environments, <small>QA</small> environments, and so on.
+and that was all there was to it. This worked for test environments,
+<small>QA</small> environments, and so on.
 
-Because of `apt-get`, we were assured that all dependencies we needed were downloaded and installed, even if we introduced new ones with new versions of the application. It was impossible to install our code if a dependency couldn't be met, and that's exactly what we wanted.
+Because of `apt-get`, we were assured that all dependencies we needed
+were downloaded and installed, even if we introduced new ones with new
+versions of the application. It was impossible to install our code if
+a dependency couldn't be met, and that's exactly what we wanted.
 
-The Ops Staff, overworked, underpaid, and under constant threat of being "right-shored," were very happy about this situation. We developers were happy because our documentation for setting up and maintaining the service, wasn't more than a single page, most of which was letter-head, introductory remarks, contact information, and so on.
+
+The Ops Staff, overworked, underpaid, and under constant threat of
+being "right-shored," were very happy about this situation. We
+developers were happy because our documentation for setting up and
+maintaining the service, wasn't more than a single page, most of which
+was letter-head, introductory remarks, contact information, and so on.
+
 
 ## connecting to the outside world
 
@@ -182,7 +201,7 @@ scheme.
 
 What we ended up with was something like the following:
 
-![Front End](:site-url/pix/front-end.png)
+![Front End](/pix/front-end.png)
 
 The client used a certificate to communicate with a load balanced web
 proxy farm running in the data center. The web proxy redirected
@@ -231,7 +250,7 @@ enough.
 Here's an illustration of the anatomy of a given service running in
 our application:
 
-![Anatomy of a Service](:site-url/pix/service-anatomy.png)
+![Anatomy of a Service](/pix/service-anatomy.png)
 
 (The above shows how easy it is to write event driven services which
 are largely ignorant of the applications feeding them data, and are
@@ -326,6 +345,6 @@ components. Make those components OS processes, and you've got a
 distributed application that works and is easy to evolve. Ideas worth
 embracing.
 
-[part1]: :site-url/articles/2009/07/11/case-study-asynchronous-rest-1
-[part2]: :site-url/articles/2009/07/15/case-study-asynchronous-rest-2
-[part3]: :site-url/articles/2009/07/23/case-study-asynchronous-rest-3
+[part1]: /post/case-study-asynchronous-rest-1
+[part2]: /post/case-study-asynchronous-rest-2
+[part3]: /post/case-study-asynchronous-rest-3

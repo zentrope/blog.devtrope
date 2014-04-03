@@ -51,7 +51,7 @@ with:
 
 What we ended up with was a rough pre-design as follows:
 
-![Areas of Concern](:site-url/pix/areas-of-concern.png "Areas of Concern")
+![Areas of Concern](/pix/areas-of-concern.png "Areas of Concern")
 
 As you can see, these areas of concern line up pretty obviously along
 the lines of what external resources they interact with, or clients
@@ -117,7 +117,7 @@ than a single application.
 
 Here's what we ended up with:
 
-![Vague Architecture](:site-url/pix/vague-architecture.png)
+![Vague Architecture](/pix/vague-architecture.png)
 
 Each area of concern became a new service in the distributed
 architecture. Each service can be optimized and designed according to
@@ -228,7 +228,7 @@ wanted to use asynchronous, topic-based messaging as our data
 pipeline, all we had to do was place a topic between each stand-alone
 service along all the internal interfaces:
 
-![Topics](:site-url/pix/async-architecture.png)
+![Topics](/pix/async-architecture.png)
 
 The above illustrates the one big drawback to messaging systems:
 they're hard to draw in such a way that a managers or architects don't
@@ -299,6 +299,6 @@ series of services running on a linux VMWare instance, and, finally,
 what happened to the service when the maintainers were forced to move
 it to a <small>J2EE</small> WebLogic cluster solution.
 
-[part1]: :site-url/articles/2009/07/11/case-study-asynchronous-rest-1
-[part2]: :site-url/articles/2009/07/15/case-study-asynchronous-rest-2
-[part3]: :site-url/articles/2009/07/23/case-study-asynchronous-rest-3
+[part1]: /post/case-study-asynchronous-rest-1
+[part2]: /post/case-study-asynchronous-rest-2
+[part3]: /post/case-study-asynchronous-rest-3
