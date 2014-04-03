@@ -13,21 +13,24 @@ a {
 
 a:hover {
   color: darkred;
+  text-decoration: underline;
 }
+
 
 header {
   position: relative;
-  height: 50px;
-  border-bottom: 1px solid #aaa;
+  height: 70px;
   margin: 0 auto;
   width: 650px;
+  margin-bottom: 30px;
 }
 
 header div.title {
   position: absolute;
-  bottom: 2px;
-  left: 0px;
-  font-size: 15pt;
+  top: 12px;
+  right: 0px;
+  text-align: right;
+  font-size: 18pt;
   font-weight: normal;
   font-style: italic;
   letter-spacing: 2px;
@@ -35,18 +38,19 @@ header div.title {
 
 header div.author {
   position: absolute;
-  bottom: 2px;
+  top: 40px;
   right: 0px;
-  font-size: 15pt;
+  font-size: 12pt;
   font-weight: normal;
   font-style: italic;
   color: #888;
+  letter-spacing: 2.9px;
 }
 
 footer {
   position: relative;
   height: 50px;
-  border-top: 1px solid #aaa;
+  /* border-top: 1px solid #aaa; */
   margin: 0 auto;
   width: 650px;
   margin-top: 20px;
@@ -60,7 +64,7 @@ footer div.copyright {
   font-size: 12pt;
   letter-spacing: 1.3px;
   color: #555;
-  text-align: center;
+  font-style: italic;
 }
 
 #container {
@@ -143,9 +147,8 @@ article h2 {
 }
 
 article section.date {
-  font-variant: small-caps;
-  font-size: 14pt;
   color: darkred;
+  font-size: 15pt;
 }
 
 article section.body p {
