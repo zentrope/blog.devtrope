@@ -6,9 +6,23 @@
     [clojure.string :as string :refer [replace]]
     [clojure.java.io :as io]
     [clojure.java.shell :as shell]
+    [clojure.data.xml :refer [indent-str sexp-as-element ->CData]]
     [hiccup.page :refer [html5 include-css]]))
 
-;; (def ^:private rfc822 (SimpleDateFormat. "EEE, dd MMM yyyy HH:mm:ss ZZZZ"))
+(def ^:private rfc822
+  (java.text.SimpleDateFormat. "EEE, dd MMM yyyy HH:mm:ss ZZZZ"))
+
+(def ^:private mdate
+  (java.text.SimpleDateFormat. "yyyy-MM-dd"))
+
+(defn- ndate
+  []
+  (.format rfc822 (java.util.Date.)))
+
+(defn- fdate
+  [d]
+  (->> (.parse mdate d)
+       (.format rfc822)))
 
 (defn delete-file-recursively!
   [f]
@@ -44,7 +58,8 @@
     [:link {:rel "alternate" :type "application/rss+xml" :title "RSS"
             :href "http://blog.devtrope.com/feeds/rss.xml"}]
     [:link {:rel "shortcut icon" :href "favicon.ico"}]
-    (include-css "http://fonts.googleapis.com/css?family=EB+Garamond&subset=latin,latin-ext")
+    (include-css
+     "http://fonts.googleapis.com/css?family=EB+Garamond&subset=latin,latin-ext")
     (include-css "/style.css")]
    [:body
     [:header
@@ -78,6 +93,29 @@
      [:section.page
       [:h1 (:title p)]
       (:html p)])))
+
+(defn- rss-feed
+  [posts]
+  (clojure.string/replace
+   (indent-str
+    (sexp-as-element
+     [:rss {:version "2.0"}
+      [:channel
+       [:title "Devtrope"]
+       [:description "Scintillating Observations."]
+       [:link "http://blog.devtrope.com"]
+       [:lastBuildDate (ndate)]
+       [:pubDate (ndate)]
+       [:ttl 1800]
+       (for [p (reverse (sort-by :when posts))]
+         [:item
+          [:title (:title p)]
+          [:link (str "http://blog.devtrope.com/post/" (:slug p) "/")]
+          [:guid (str "http://blog.devtrope.com/post/" (:slug p) "/")]
+          [:pubDate (fdate (:when p))]
+          [:description [:-cdata (:html p)]]
+          ])]]))
+   "><" ">\n<"))
 
 (defn- load-text!
   [f]
@@ -114,8 +152,8 @@
   (println "Running.")
 
   (let [texts (load-index!)
-        posts (scoop-posts texts)
         root (io/as-file "pub")
+        posts (mapv #(assoc % :html (markdown! (:text %))) (scoop-posts texts))
         pages (mapv #(assoc % :html (markdown! (:text %))) (scoop-pages texts))]
     ;;
     (when (.exists root)
@@ -128,8 +166,13 @@
     (copy-dir! (io/file (io/resource "assets"))
                root)
     ;;
+    (let [feed-dir (io/file root "feeds")]
+      (.mkdirs feed-dir)
+      (spit (io/file feed-dir "rss.xml")
+            (rss-feed posts)))
+    ;;
     (doseq [post posts]
-      (let [html (post-page (:title post) (:when post) (markdown! (:text post)))
+      (let [html (post-page (:title post) (:when post) (:html post))
             loc (io/as-file (str "pub/post/" (:slug post)))
             place (io/file loc "index.html")]
         (.mkdirs loc)

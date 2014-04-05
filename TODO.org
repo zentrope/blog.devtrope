@@ -22,8 +22,8 @@ stored with the code, so no separation of app from data anymore.
  - [X] Script/css style management.
  - [X] Nice garamond-like web font of some sort.
  - [X] Image asset management.
- - [ ] RSS feed generation.
- - [ ] Final fixes (for first pub).
+ - [X] RSS feed generation.
+ - [X] Final fixes (for first pub).
 
 ** After re-publication
 
