@@ -40,6 +40,9 @@
     [:title "Devtrope"]
     [:meta {:charset "utf-8"}]
     [:meta {:http-quiv "X-UA-Compatible" :content "IE=edge"}]
+    [:meta {:name "viewport" :content "width=device-width"}]
+    [:link {:rel "alternate" :type "application/rss+xml" :title "RSS"
+            :href "http://blog.devtrope.com/feeds/rss.xml"}]
     [:link {:rel "shortcut icon" :href "favicon.ico"}]
     (include-css "http://fonts.googleapis.com/css?family=EB+Garamond&subset=latin,latin-ext")
     (include-css "/style.css")]

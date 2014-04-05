@@ -27,7 +27,7 @@ stored with the code, so no separation of app from data anymore.
 
 ** After re-publication
 
- - [ ] Responsive design.
+ - [X] Responsive design.
  - [ ] Allow org-mode posts.
 
 That about does it, I think.
