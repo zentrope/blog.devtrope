@@ -6,8 +6,10 @@
     [clojure.string :as string :refer [replace]]
     [clojure.java.io :as io]
     [clojure.java.shell :as shell]
-    [clojure.data.xml :refer [indent-str sexp-as-element ->CData]]
+    [clojure.data.xml :refer [indent-str sexp-as-element]]
     [hiccup.page :refer [html5 include-css]]))
+
+;;-----------------------------------------------------------------------------
 
 (def ^:private rfc822
   (java.text.SimpleDateFormat. "EEE, dd MMM yyyy HH:mm:ss ZZZZ"))
@@ -24,7 +26,9 @@
   (->> (.parse mdate d)
        (.format rfc822)))
 
-(defn delete-file-recursively!
+;;-----------------------------------------------------------------------------
+
+(defn- delete-file-recursively!
   [f]
   (let [f (io/file f)]
     (if (.isDirectory f)
@@ -32,7 +36,7 @@
         (delete-file-recursively! child)))
     (io/delete-file f)))
 
-(defn copy-dir!
+(defn- copy-dir!
   [from to]
   (let [[top & files] (file-seq from)
         root-path (str (.getPath top) "/")]
@@ -47,6 +51,8 @@
   [string]
   (:out (shell/sh "/usr/local/bin/mmd" "--notes" "--smart" :in string)))
 
+;;-----------------------------------------------------------------------------
+
 (defn- container
   [& body]
   (html5
@@ -56,7 +62,7 @@
     [:meta {:http-quiv "X-UA-Compatible" :content "IE=edge"}]
     [:meta {:name "viewport" :content "width=device-width"}]
     [:link {:rel "alternate" :type "application/rss+xml" :title "RSS"
-            :href "http://blog.devtrope.com/feeds/rss.xml"}]
+            :href "http://devtrope.com/feeds/rss.xml"}]
     [:link {:rel "shortcut icon" :href "favicon.ico"}]
     (include-css
      "http://fonts.googleapis.com/css?family=EB+Garamond&subset=latin,latin-ext")
@@ -103,19 +109,21 @@
       [:channel
        [:title "Devtrope"]
        [:description "Scintillating Observations."]
-       [:link "http://blog.devtrope.com"]
+       [:link "http://devtrope.com"]
        [:lastBuildDate (ndate)]
        [:pubDate (ndate)]
        [:ttl 1800]
        (for [p (reverse (sort-by :when posts))]
          [:item
           [:title (:title p)]
-          [:link (str "http://blog.devtrope.com/post/" (:slug p) "/")]
-          [:guid (str "http://blog.devtrope.com/post/" (:slug p) "/")]
+          [:link (str "http://devtrope.com/post/" (:slug p) "/")]
+          [:guid (str "http://devtrope.com/post/" (:slug p) "/")]
           [:pubDate (fdate (:when p))]
           [:description [:-cdata (:html p)]]
           ])]]))
    "><" ">\n<"))
+
+;;-----------------------------------------------------------------------------
 
 (defn- load-text!
   [f]
@@ -146,6 +154,8 @@
   (->> (filter #(= (:type %) :post) texts)
        (sort-by :when)
        (reverse)))
+
+;;-----------------------------------------------------------------------------
 
 (defn -main
   [& args]
