@@ -2,5 +2,5 @@
  :title "About"
  :order 1}
 
-Just a simple web log with my random thoughts related to software
-development and culture.
+Random (and occasional) thoughts about the culture of software
+development as I experience it, and other less-frequent topics.
