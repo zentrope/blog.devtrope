@@ -7,7 +7,7 @@
                  [hiccup "1.0.5"]]
   :clean-targets ["target" "pub"]
   :jvm-opts ["-Dapple.awt.UIElement=true"]
-  :min-lein-version "2.3.4"
+  :min-lein-version "2.4.2"
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
   :main ^:skip-aot blog.main)
