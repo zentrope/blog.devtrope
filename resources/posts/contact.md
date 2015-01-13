@@ -2,18 +2,18 @@
  :title "Contact Keith Irwin"
  :order 2}
 
- - &raquo; my first name @ this domain
- - &raquo; [@devtrope](https://twitter.com/devtrope)
- - &raquo; [feed](http://devtrope.com/feeds/rss.xml)
+ * my first name @ this domain
+ * [@devtrope](https://twitter.com/devtrope)
+ * [feed](http://devtrope.com/feeds/rss.xml)
 
-**[Flipping the Bozo Bit][2]:** An occassional podcast I do with
+**[Flipping the Bozo Bit][2]:** An occasional podcast I do with
 [Christoph Neumann][4] about software development philosophy and
 practice.
 
- - &raquo; [Web][2]
- - &raquo; [Feed][5]
- - &raquo; [iTunes][3]
- - &raquo; [@flipthebozobit][1]
+ * [Web][2]
+ * [Feed][5]
+ * [iTunes][3]
+ * [@flipthebozobit][1]
 
 [1]: https://twitter.com/flipthebozobit
 [2]: http://ftbb.tv

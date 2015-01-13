@@ -102,12 +102,13 @@
   (container
    [:section.posts
     [:h1 "Contents"]
-    [:ul
-     (for [{:keys [slug title when]} posts]
-       [:li
-        [:span.date when]
-        " "
-        [:span.link [:a {:href (str "post/" slug "/")} title]]])]]
+    [:div.contents
+     [:ul
+      (for [{:keys [slug title when]} posts]
+        [:li
+         [:div.date when]
+         " "
+         [:span.link [:a {:href (str "post/" slug "/")} title]]])]]]
    (for [p pages]
      [:section.page
       [:h1 (:title p)]
@@ -184,7 +185,7 @@
     ;;
     (.mkdirs root)
     ;;
-    (spit (io/file root  "index.html") (index-page posts pages))
+    (spit (io/file root "index.html") (index-page posts pages))
     ;;
     (copy-dir! (io/file (io/resource "assets"))
                root)
