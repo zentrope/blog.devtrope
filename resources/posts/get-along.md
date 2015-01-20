@@ -52,7 +52,7 @@ calender when out of the building. Take the stairs rather than the
 elevator. Wear headphones as much as possible. Do not keep personal
 items on or near your desk. Do not keep anything personal on your work
 computer. Do not eat lunch with others. Do not attend optional
-meetings. Do not engage in small talk. Do engage in conversations
+meetings. Do not engage in small talk. Do not engage in conversations
 about craft, theory, process, past mistakes, past victories, past
 jobs, past relationships, future prospects. Do not talk.
 
