@@ -63,7 +63,7 @@
     [:meta {:name "viewport" :content "width=device-width"}]
     [:link {:rel "alternate" :type "application/rss+xml" :title "RSS"
             :href "http://devtrope.com/feeds/rss.xml"}]
-    [:link {:rel "icon" :href "favicon.png"}]
+    [:link {:rel "icon" :href "/favicon.png"}]
     (include-css
      "http://fonts.googleapis.com/css?family=EB+Garamond&subset=latin,latin-ext")
     (include-css "/style.css")]
